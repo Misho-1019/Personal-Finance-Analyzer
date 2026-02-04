@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authService from "../services/authService.js";
+import { isAuth } from "../middlewares/authMiddleware.js";
 
 const authController = Router();
 
@@ -26,7 +27,7 @@ authController.post('/login', async (req, res) => {
     }
 })
 
-authController.get('/logout', async (req, res) => {
+authController.get('/logout', isAuth, async (req, res) => {
     res.clearCookie('auth')
 
     return res.status(200).json({ message: 'Logout successfully!' })

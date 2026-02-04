@@ -17,3 +17,11 @@ export const authMiddleware = (req, res, next) => {
         return res.status(401).json({ error: 'Invalid or expired token' })
     }
 }
+
+export const isAuth = (req, res, next) => {
+    if (!req.user) {
+        return res.status(401).json({ message: 'Unauthorized' })
+    }
+
+    next()
+}
