@@ -25,7 +25,22 @@ export default {
             }
         })
 
-        return newUser;
+        const payload = {
+            id: newUser.id,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            email: newUser.email,
+        }
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' })
+
+        return {
+            token,
+            id: newUser.id,
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            email: newUser.email,
+        };
     },
     async login(authData) {
         const { email, password } = authData;
@@ -49,14 +64,16 @@ export default {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            password: user.passwordHash
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '2h' })
 
         return {
             token,
-            payload,
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
         }
     }
 }

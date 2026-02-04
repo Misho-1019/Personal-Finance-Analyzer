@@ -10,6 +10,8 @@ authController.post('/register', isGuest, async (req, res) => {
     try {
         const user = await authService.register(authData)
 
+        res.cookie('auth', user.token, { httpOnly: true })
+
         return res.status(201).json(user)
     } catch (error) {
         return res.status(500).json({ error: error.message })
@@ -20,11 +22,11 @@ authController.post('/login', isGuest, async (req, res) => {
     const authData = req.body;
 
     try {
-        const { token, payload } = await authService.login(authData);
+        const user = await authService.login(authData);
 
-        res.cookie('auth', token, { httpOnly: true })
+        res.cookie('auth', user.token, { httpOnly: true })
 
-        return res.status(200).json(payload)
+        return res.status(200).json(user)
     } catch (error) {
         console.log(error.message);
         return res.status(500).json(error.message)
