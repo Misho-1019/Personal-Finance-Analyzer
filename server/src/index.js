@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import router from "./router.js";
+import { authMiddleware } from "./middlewares/authMiddleware.js";
 
 dotenv.config();
 
@@ -10,6 +11,7 @@ const app = express()
 app.use(express.json())
 
 app.use(cookieParser())
+app.use(authMiddleware)
 
 app.use(router)
 
