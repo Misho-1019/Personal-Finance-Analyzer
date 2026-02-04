@@ -6,9 +6,17 @@ export default {
     async register(authData) {
         const {firstName, lastName, email, password} = authData;
 
+        const user = await prisma.user.findUnique({
+            where: { email },
+        })
+
+        if (user) {
+            throw new Error('User already exists!')
+        }
+
         const passwordHash = await bcrypt.hash(password, 10)
 
-        const user = await prisma.user.create({
+        const newUser = await prisma.user.create({
             data: {
                 firstName,
                 lastName,
@@ -17,7 +25,7 @@ export default {
             }
         })
 
-        return user;
+        return newUser;
     },
     async login(authData) {
         const { email, password } = authData;
