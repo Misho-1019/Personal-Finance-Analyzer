@@ -1,11 +1,12 @@
 import { Router } from "express";
+import authService from "../services/authService";
 
 const authController = Router();
 
-authController.post('/register', (req, res) => {
+authController.post('/register', async (req, res) => {
     const authData = req.body;
 
-    console.log(authData);
+    await authService.register(authData)
     
     res.end();
 })
