@@ -25,3 +25,11 @@ export const isAuth = (req, res, next) => {
 
     next()
 }
+
+export const isGuest = (req, res, next) => {
+    if (req.user) {
+        return res.status(400).json({ error: 'You are already logged in' })
+    }
+
+    next()
+}
