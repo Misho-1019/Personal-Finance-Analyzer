@@ -7,9 +7,13 @@ const authController = Router();
 authController.post('/register', async (req, res) => {
     const authData = req.body;
 
-    const user = await authService.register(authData)
-    
-    return res.status(201).json(user)
+    try {
+        const user = await authService.register(authData)
+
+        return res.status(201).json(user)
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
 })
 
 authController.post('/login', async (req, res) => {
