@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import router from "./router.js";
 import prisma from "./prismaClient.js";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import { authMiddleware } from "./middlewares/authMiddleware.js";
 
 (async () => {
@@ -35,6 +36,13 @@ app.use(cookieParser())
 app.use(router)
 app.use(authMiddleware)
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests from this IP, please try again later.',
+})
+
+app.use(limiter)
 
 const port = process.env.PORT || 3030;
 
