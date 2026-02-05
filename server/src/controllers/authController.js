@@ -10,11 +10,12 @@ authController.post('/register', isGuest, validateBody(registerSchema), async (r
     const authData = req.body;
 
     try {
-        const user = await authService.register(authData)
+        const {accessToken, refreshToken} = await authService.register(authData)
 
-        res.cookie('auth', user.token, { httpOnly: true })
+        res.cookie('auth', accessToken.token, { httpOnly: true, sameSite: 'lax' })
+        res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: 'lax' })
 
-        return res.status(201).json(user)
+        return res.status(201).json(accessToken)
     } catch (error) {
         return res.status(500).json({ error: error.message })
     }
@@ -24,11 +25,12 @@ authController.post('/login', isGuest, validateBody(loginShcema), async (req, re
     const authData = req.body;
 
     try {
-        const user = await authService.login(authData);
+        const {accessToken, refreshToken} = await authService.login(authData);
 
-        res.cookie('auth', user.token, { httpOnly: true })
+        res.cookie('auth', accessToken.token, { httpOnly: true, sameSite: 'lax' })
+        res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: 'lax'})
 
-        return res.status(200).json(user)
+        return res.status(200).json(accessToken)
     } catch (error) {
         console.log(error.message);
         return res.status(500).json(error.message)
@@ -36,9 +38,32 @@ authController.post('/login', isGuest, validateBody(loginShcema), async (req, re
 })
 
 authController.get('/logout', isAuth, async (req, res) => {
-    res.clearCookie('auth')
+    try {
+        await authService.logout(req.cookies?.refresh)
 
-    return res.status(200).json({ message: 'Logout successfully!' })
+        res.clearCookie('auth')
+        res.clearCookie('refresh')
+    
+        return res.status(200).json({ message: 'Logout successfully!' })
+    } catch (error) {
+        return res.status(500).json({ error: error.message })
+    }
+})
+
+authController.post('/refresh', async (req, res) => {
+    try {
+        const { accessToken, refreshToken } = await authService.refresh(req.cookies?.refresh)
+
+        res.cookie('auth', accessToken.token, { httpOnly: true, sameSite: 'lax' })
+        res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: 'lax' })
+
+        return res.status(200).json({ message: 'Tokens refreshed successfully' })
+    } catch (error) {
+        res.clearCookie('auth')
+        res.clearCookie('refresh')
+
+        return res.status(500).json({ error: error.message })
+    }
 })
 
 export default authController;

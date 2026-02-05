@@ -15,20 +15,20 @@ function buildAccessToken(user) {
     requiredSecret()
 
     const payload = {
-        id: newUser.id,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        email: newUser.email,
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
     }
 
     const token = jwt.sign(payload, SECRET, { expiresIn: ACCESS_EXPIRES_IN })
 
     return {
         token,
-        id: newUser.id,
-        firstName: newUser.firstName,
-        lastName: newUser.lastName,
-        email: newUser.email,
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
     }
 }
 
