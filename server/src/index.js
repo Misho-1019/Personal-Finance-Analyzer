@@ -4,8 +4,9 @@ dotenv.config();
 import express from "express";
 import cookieParser from "cookie-parser";
 import router from "./router.js";
-import { authMiddleware } from "./middlewares/authMiddleware.js";
 import prisma from "./prismaClient.js";
+import cors from "cors";
+import { authMiddleware } from "./middlewares/authMiddleware.js";
 
 (async () => {
     try {
@@ -20,12 +21,20 @@ import prisma from "./prismaClient.js";
 
 const app = express()
 
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+)
+
+
 app.use(express.json())
 app.use(cookieParser())
 
+app.use(router)
 app.use(authMiddleware)
 
-app.use(router)
 
 const port = process.env.PORT || 3030;
 
