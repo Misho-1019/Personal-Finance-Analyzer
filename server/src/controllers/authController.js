@@ -1,10 +1,12 @@
 import { Router } from "express";
 import authService from "../services/authService.js";
 import { isAuth, isGuest } from "../middlewares/authMiddleware.js";
+import { validateBody } from "../middlewares/validateBody.js";
+import { loginShcema, registerSchema } from "../validators/authSchema.js";
 
 const authController = Router();
 
-authController.post('/register', isGuest, async (req, res) => {
+authController.post('/register', isGuest, validateBody(registerSchema), async (req, res) => {
     const authData = req.body;
 
     try {
@@ -18,7 +20,7 @@ authController.post('/register', isGuest, async (req, res) => {
     }
 })
 
-authController.post('/login', isGuest, async (req, res) => {
+authController.post('/login', isGuest, validateBody(loginShcema), async (req, res) => {
     const authData = req.body;
 
     try {
