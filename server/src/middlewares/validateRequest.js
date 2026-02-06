@@ -1,6 +1,7 @@
 export function validateRequest({ body, query, params } = {}) {
     return (req, res, next) => {
         const errors = [];
+        req.validated = {};
 
         if (body) {
             const result = body.safeParse(req.body)
@@ -30,7 +31,7 @@ export function validateRequest({ body, query, params } = {}) {
                     }))
                 )
             } else {
-                req.query = result.data
+                req.validated.query = result.data
             }
         }
 
@@ -46,7 +47,7 @@ export function validateRequest({ body, query, params } = {}) {
                     }))
                 )
             } else {
-                req.params = result.data
+                req.validated.params = result.data
             }
         }
 
