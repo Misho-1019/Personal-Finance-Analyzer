@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { isAuth } from "../middlewares/authMiddleware.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
-import { createTransactionSchema } from "../validators/transactionSchema.js";
+import { createTransactionSchema, listTransactionsSchema } from "../validators/transactionSchema.js";
 import transactionService from "../services/transactionService.js";
 
 const transactionController = Router();
@@ -21,6 +21,21 @@ transactionController.post('/', isAuth, validateRequest({ body: createTransactio
             return res.status(error.status).json({ error: error.message })
         }
 
+        return res.status(500).json({ error: 'Internal Server Error' })
+    }
+})
+
+transactionController.get('/', isAuth, validateRequest({ query: listTransactionsSchema }), async (req, res) => {
+    const userId = req.user.id;
+    const { page, pageSize } = req.validated.query;
+
+    try {
+        const data = await transactionService.list(userId, { page, pageSize })
+
+        return res.status(200).json(data)
+    } catch (error) {
+        console.log(error);
+        
         return res.status(500).json({ error: 'Internal Server Error' })
     }
 })
