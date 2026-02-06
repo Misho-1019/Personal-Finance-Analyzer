@@ -33,7 +33,6 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
-app.use(router)
 app.use(authMiddleware)
 
 const limiter = rateLimit({
@@ -42,7 +41,9 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
 })
 
-app.use(limiter)
+// app.use(limiter)
+
+app.use(router)
 
 const port = process.env.PORT || 3030;
 
