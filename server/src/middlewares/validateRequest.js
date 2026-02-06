@@ -7,7 +7,7 @@ export function validateRequest({ body, query, params } = {}) {
 
             if (!result.success) {
                 errors.push(
-                    ...result.error.errors.map((e) => ({
+                    ...result.error.issues.map((e) => ({
                         location: "body",
                         field: e.path.join('.'),
                         message: e.message,
@@ -23,7 +23,7 @@ export function validateRequest({ body, query, params } = {}) {
 
             if (!result.success) {
                 errors.push(
-                    ...result.error.errors.map((e) => ({
+                    ...result.error.issues.map((e) => ({
                         location: 'query',
                         field: e.path.join('.'),
                         message: e.message,
@@ -39,7 +39,7 @@ export function validateRequest({ body, query, params } = {}) {
 
             if (!result.success) {
                 errors.push(
-                    ...result.error.errors.map((e) => ({
+                    ...result.error.issues.map((e) => ({
                         location: 'params',
                         field: e.path.join('.'),
                         message: e.message,
