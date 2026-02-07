@@ -32,13 +32,27 @@ export default {
 
         return transaction
     },
-    async list(userId, { page, pageSize }) {
+    async list(userId, { page, pageSize, from, to }) {
+        const mainWhere = { userId }
+
+        if (from || to) {
+            mainWhere.date = {};
+
+            if (from) {
+                mainWhere.date.gte = new Date(from)
+            }
+
+            if (to) {
+                mainWhere.date.lte = new Date(to)
+            }
+        }
+
         const [totalItems, items] = await Promise.all([
             prisma.transaction.count({
-                where: { userId }
+                where: mainWhere,
             }),
             prisma.transaction.findMany({
-                where: { userId },
+                where: mainWhere,
                 orderBy: [{ date: 'desc' }, { createdAt: 'desc' }],
                 skip: (page - 1) * pageSize,
                 take: pageSize,
@@ -52,7 +66,7 @@ export default {
             })
         ])
 
-        const totalPages = Math.max(Math.ceil(totalItems / pageSize))
+        const totalPages = Math.ceil(totalItems / pageSize)
 
         if (page > totalPages) {
             return {

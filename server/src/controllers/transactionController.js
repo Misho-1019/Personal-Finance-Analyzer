@@ -27,10 +27,10 @@ transactionController.post('/', isAuth, validateRequest({ body: createTransactio
 
 transactionController.get('/', isAuth, validateRequest({ query: listTransactionsSchema }), async (req, res) => {
     const userId = req.user.id;
-    const { page, pageSize } = req.validated.query;
+    const { page, pageSize, from, to } = req.validated.query;
 
     try {
-        const data = await transactionService.list(userId, { page, pageSize })
+        const data = await transactionService.list(userId, { page, pageSize, from, to })
 
         return res.status(200).json(data)
     } catch (error) {
