@@ -32,7 +32,7 @@ export default {
 
         return transaction
     },
-    async list(userId, { page, pageSize, from, to }) {
+    async list(userId, { page, pageSize, from, to, type }) {
         const mainWhere = { userId }
 
         if (from || to) {
@@ -45,6 +45,10 @@ export default {
             if (to) {
                 mainWhere.date.lte = new Date(to)
             }
+        }
+
+        if (type) {
+            mainWhere.type = type
         }
 
         const [totalItems, items] = await Promise.all([
