@@ -58,4 +58,21 @@ transactionController.patch('/:id', isAuth, validateRequest({ body: updateTransa
     }
 })
 
+transactionController.delete('/:id', isAuth, validateRequest({ params: idParamsSchema }), async (req, res) => {
+    const userId = req.user.id;
+    const transactionId = req.validated.params.id;
+
+    try {
+        await transactionService.delete(userId, transactionId)
+
+        return res.status(204).send();
+    } catch (error) {
+        if (error.status) {
+            return res.status(error.status).json({ error: error.message })
+        }
+
+        return res.status(500).json({ error: 'Internal Server Error' })
+    }
+})
+
 export default transactionController;
