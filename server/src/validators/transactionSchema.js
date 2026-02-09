@@ -20,3 +20,26 @@ export const listTransactionsSchema = z.object({
     type: z.enum(['INCOME', 'EXPENSE']).optional(),
     categoryId: z.string().nonempty().optional(),
 }) 
+
+export const updateTransactionSchema = z.object({
+    type: z.enum(['INCOME', 'EXPENSE']).optional(),
+    amountCents: z.number().int().positive().optional(),
+    date: z.string().refine(
+        (value) => !Number.isNaN(Date.parse(value)),
+        { message: 'Invalid date' },
+    ).optional(),
+    description: z.string().min(1).max(300).optional(),
+    notes: z.union([z.string().min(1), z.null()]).optional(),
+    categoryId: z.union([z.string().nonempty(), z.null()]).optional()
+}).strict().superRefine((obj, ctx) => {
+    if (Object.keys(obj).length === 0) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'At least one field must be provided',
+        })
+    }
+})
+
+export const idParamsSchema = z.object({
+    id: z.string().nonempty()
+}).strict();
