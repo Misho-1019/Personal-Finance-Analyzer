@@ -151,5 +151,23 @@ export default {
                 }
             }}
         })
+    },
+    async delete(userId, transactionId) {
+        const findTransaction = await prisma.transaction.findFirst({
+            where: {
+                id: transactionId,
+                userId: userId,
+            }
+        })
+
+        if (!findTransaction) {
+            const err = new Error('Not Found')
+            err.status = 404;
+            throw err;
+        }
+
+        await prisma.transaction.delete({
+            where: { id: transactionId }
+        })
     }
 }
