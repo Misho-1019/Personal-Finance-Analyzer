@@ -1,5 +1,11 @@
 import prisma from "../prismaClient.js";
 
+function cleanPatchData(input) {
+    return Object.fromEntries(
+        Object.entries(input).filter(([_, value]) => value !== '' && value !== undefined)
+    )
+}
+
 export default {
     async create(userId, transactionData) {
         const { type, amountCents, date, description, notes, categoryId } = transactionData;
@@ -93,5 +99,57 @@ export default {
             totalItems,
             totalPages,
         }
+    },
+    async update(userId, transactionId, transactionData) {
+        const findTransaction = await prisma.transaction.findFirst({
+            where: { 
+                id: transactionId,
+                userId: userId 
+            }
+        })
+
+        if (!findTransaction) {
+            const err = new Error('Not Found')
+            err.status = 404;
+            throw err;
+        }
+
+        const cleanedData = cleanPatchData(transactionData)
+
+        const { type, amountCents, date, description, notes, categoryId } = cleanedData;
+
+        if (typeof categoryId === 'string') {
+            const category = await prisma.category.findFirst({
+                where: { id: categoryId, userId },
+                select: { id: true },
+            })
+
+            if (!category) {
+                const err = new Error('Category not found')
+                err.status = 404;
+                throw err;
+            }
+        }
+
+        const data = {};
+
+        if (type !== undefined) data.type = type;
+        if (amountCents !== undefined) data.amountCents = amountCents;
+        if (description !== undefined) data.description = description;
+        if (notes !== undefined) data.notes = notes;
+        if (categoryId !== undefined) data.categoryId = categoryId;
+        if (date !== undefined) data.date = new Date(date);
+
+        return await prisma.transaction.update({
+            where: { id: transactionId },
+            data,
+            include: { category: {
+                select: {
+                    id: true,
+                    name: true,
+                    color: true
+                }
+            }}
+        })
     }
 }

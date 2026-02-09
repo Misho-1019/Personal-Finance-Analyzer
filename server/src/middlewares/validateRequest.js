@@ -15,7 +15,7 @@ export function validateRequest({ body, query, params } = {}) {
                     }))
                 )
             } else {
-                req.body = result.data
+                req.validated.body = result.data
             }
         }
 
