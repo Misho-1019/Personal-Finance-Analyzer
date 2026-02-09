@@ -1,13 +1,13 @@
 import { Router } from "express";
 import { isAuth } from "../middlewares/authMiddleware.js";
 import { validateRequest } from "../middlewares/validateRequest.js";
-import { createTransactionSchema, listTransactionsSchema } from "../validators/transactionSchema.js";
+import { createTransactionSchema, idParamsSchema, listTransactionsSchema, updateTransactionSchema } from "../validators/transactionSchema.js";
 import transactionService from "../services/transactionService.js";
 
 const transactionController = Router();
 
 transactionController.post('/', isAuth, validateRequest({ body: createTransactionSchema }), async (req, res) => {
-    const transactionData = req.body;
+    const transactionData = req.validated.body;
     const userId = req.user.id;
 
     try {
@@ -36,6 +36,24 @@ transactionController.get('/', isAuth, validateRequest({ query: listTransactions
     } catch (error) {
         console.log(error);
         
+        return res.status(500).json({ error: 'Internal Server Error' })
+    }
+})
+
+transactionController.patch('/:id', isAuth, validateRequest({ body: updateTransactionSchema, params: idParamsSchema }), async (req, res) => {
+    const userId = req.user.id;
+    const transactionId = req.validated.params.id;
+    const transactionData = req.validated.body;
+
+    try {
+        const updatedTransaction = await transactionService.update(userId, transactionId, transactionData)
+
+        return res.status(200).json(updatedTransaction)
+    } catch (error) {
+        if (error.status) {
+            return res.status(error.status).json({ error: error.message })
+        }
+
         return res.status(500).json({ error: 'Internal Server Error' })
     }
 })
