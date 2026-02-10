@@ -23,4 +23,16 @@ categoryController.post('/', isAuth, validateRequest({ body: createCategorySchem
     }
 })
 
+categoryController.get('/', isAuth, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const categories = await categoryService.list(userId);
+        
+        return res.status(200).json(categories)
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error' })
+    }
+})
+
 export default categoryController;
