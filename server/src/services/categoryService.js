@@ -28,5 +28,11 @@ export default {
         })
 
         return category;
+    },
+    async list(userId) {
+        return await prisma.category.findMany({
+            where: { userId },
+            orderBy: { name: 'asc' }
+        })
     }
 }
