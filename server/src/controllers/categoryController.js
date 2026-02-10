@@ -54,4 +54,21 @@ categoryController.patch('/:id', isAuth, validateRequest({ params: idParamsSchem
     }
 })
 
+categoryController.delete('/:id', isAuth, validateRequest({ params: idParamsSchema }), async (req, res) => {
+    const userId = req.user.id;
+    const categoryId = req.validated.params.id;
+    
+    try {
+        await categoryService.delete(userId, categoryId);
+
+        return res.status(204).send();
+    } catch (error) {
+        if (error.status) {
+            return res.status(error.status).json({ error: error.message })
+        }
+
+        return res.status(500).json({ error: 'Internal server error' })
+    }
+})
+
 export default categoryController;
