@@ -80,5 +80,29 @@ export default {
         })
 
         return updatedCategory;
+    },
+    async delete(userId, categoryId) {
+        const findCategory = await prisma.category.findFirst({
+            where: {
+                id: categoryId,
+                userId,
+            }
+        })
+
+        if (!findCategory) {
+            const err = new Error("Category not found");
+            err.status = 404;
+            throw err;
+        }
+
+        await prisma.$transaction([
+            prisma.transaction.updateMany({
+                where: { categoryId, userId },
+                data: { categoryId: null },
+            }),
+            prisma.category.delete({
+                where: { id: categoryId },
+            })
+        ])
     }
 }
