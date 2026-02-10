@@ -34,5 +34,51 @@ export default {
             where: { userId },
             orderBy: { name: 'asc' }
         })
+    },
+    async update(userId, categoryId, updateData) {
+        const category = await prisma.category.findFirst({
+            where: {
+                id: categoryId,
+                userId,
+            }
+        })
+
+        if (!category) {
+            const err = new Error("Category not found");
+            err.status = 404;
+            throw err;
+        }
+
+        const data = {};
+
+        if (updateData.name !== undefined) {
+            const normalizedName = updateData.name.trim();
+
+            const existingCategory = await prisma.category.findFirst({
+                where: {
+                    userId,
+                    name: { equals: normalizedName, mode: 'insensitive' },
+                    id: { not: categoryId },
+                },
+                select: { id: true }
+            })
+
+            if (existingCategory) {
+                const err = new Error("Category with this name already exists");
+                err.status = 409;
+                throw err;
+            }
+
+            data.name = normalizedName;
+        }
+
+        if (updateData.color !== undefined) data.color = updateData.color;
+
+        const updatedCategory = await prisma.category.update({
+            where: { id: categoryId },
+            data,
+        })
+
+        return updatedCategory;
     }
 }
