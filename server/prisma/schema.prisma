@@ -30,6 +30,7 @@ model User {
 
   categories   Category[]
   transactions Transaction[]
+  categoryKeywords CategoryKeyword[]
 }
 
 model RefreshToken {
@@ -58,9 +59,26 @@ model Category {
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions Transaction[]
+  keywords CategoryKeyword[]
 
   @@unique([userId, name])
   @@index([userId])
+}
+
+model CategoryKeyword {
+  id         String   @id @default(cuid())
+  userId     String
+  categoryId String
+  keyword    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, keyword])
+  @@index([userId])
+  @@index([categoryId])
 }
 
 model Transaction {
