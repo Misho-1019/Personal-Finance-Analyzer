@@ -23,4 +23,16 @@ categoryKeywordController.post('/', isAuth, validateRequest({ body: createCatego
     }
 })
 
+categoryKeywordController.get('/', isAuth, async (req, res) => {
+    const userId = req.user.id;
+
+    try {
+        const categoryKeywords = await categoryKeywordService.list(userId);
+
+        return res.status(200).json(categoryKeywords);
+    } catch (error) {
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+})
+
 export default categoryKeywordController;
