@@ -48,5 +48,22 @@ export default {
         })
 
         return categoryKeyword;
+    },
+    async list(userId) {
+        const categoryKeywords = await prisma.categoryKeyword.findMany({
+            where: { userId },
+            include: {
+                category: {
+                    select: {
+                        id: true,
+                        name: true,
+                        color: true,
+                    }
+                }
+            },
+            orderBy: { keyword: 'asc' },
+        })
+
+        return categoryKeywords
     }
 }
