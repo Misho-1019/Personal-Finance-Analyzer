@@ -65,5 +65,23 @@ export default {
         })
 
         return categoryKeywords
+    },
+    async delete(userId, categoryKeywordId) {
+        const findCategoryKeyword = await prisma.categoryKeyword.findFirst({
+            where: {
+                id: categoryKeywordId,
+                userId,
+            }
+        })
+
+        if (!findCategoryKeyword) {
+            const err = new Error("Category keyword not found");
+            err.status = 404;
+            throw err;
+        }
+
+        await prisma.categoryKeyword.delete({
+            where: { id: categoryKeywordId },
+        })
     }
 }
