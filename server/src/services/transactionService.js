@@ -1,4 +1,5 @@
 import prisma from "../prismaClient.js";
+import { autoCategorize } from "./autoCategorizationService.js";
 
 function cleanPatchData(input) {
     return Object.fromEntries(
@@ -9,6 +10,8 @@ function cleanPatchData(input) {
 export default {
     async create(userId, transactionData) {
         const { type, amountCents, date, description, notes, categoryId } = transactionData;
+
+        let finalCategoryId = categoryId ?? null;
 
         if (categoryId) {
             const category = await prisma.category.findFirst({
@@ -21,12 +24,22 @@ export default {
                 err.status = 404;
                 throw err;
             }
+
+            finalCategoryId = categoryId;
+        } else if (categoryId === null || categoryId === undefined) {
+            const result = await autoCategorize(userId, description);
+
+            if (result) {
+                finalCategoryId = result.categoryId;
+            } else {
+                finalCategoryId = null;
+            }
         }
 
         const transaction = await prisma.transaction.create({
             data: {
                 userId,
-                categoryId: categoryId ?? null,
+                categoryId: finalCategoryId,
                 type,
                 amountCents,
                 date: new Date(date),
@@ -131,7 +144,17 @@ export default {
             }
         }
 
+        const categoryIdProvided = categoryId !== undefined;
+
         const data = {};
+
+        if (description !== undefined && !categoryIdProvided && findTransaction.categoryId === null) {
+            const result = await autoCategorize(userId, description);
+
+            if (result) {
+                data.categoryId = result.categoryId;
+            }
+        }
 
         if (type !== undefined) data.type = type;
         if (amountCents !== undefined) data.amountCents = amountCents;
