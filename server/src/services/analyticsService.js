@@ -1,6 +1,17 @@
 // src/services/analyticsService.js
 import prisma from "../prismaClient.js";
 
+function startOfDay(dateStr) {
+  // Safe because dateStr is validated as YYYY-MM-DD upstream
+  return new Date(`${dateStr}T00:00:00.000Z`);
+}
+
+function startOfNextDayUtc(dateStr) {
+  const d = startOfDay(dateStr);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d;
+}
+
 export default {
   async monthlySummary(userId, { from, to } = {}) {
     // ---------- Date helpers (UTC, deterministic) ----------
@@ -127,4 +138,82 @@ export default {
       totalNetCents,
     };
   },
+  async categoriesSummary(userId, { from, to, type } = {}) {
+    const fromStartUtc = startOfDay(from);
+    const toEndExclusiveUtc = startOfNextDayUtc(to);
+  
+    const where = {
+      userId,
+      date: {
+        gte: fromStartUtc,
+        lt: toEndExclusiveUtc,
+      },
+      ...(type ? { type } : {}),
+    };
+  
+    // 1) Aggregate transactions by categoryId
+    const grouped = await prisma.transaction.groupBy({
+      by: ["categoryId"],
+      where,
+      _sum: { amountCents: true },
+      _count: { _all: true },
+    });
+  
+    // 2) Fetch category names for non-null categoryId
+    const categoryIds = grouped
+      .map((g) => g.categoryId)
+      .filter((id) => id !== null);
+  
+    const categories =
+      categoryIds.length > 0
+        ? await prisma.category.findMany({
+            where: {
+              userId,
+              id: { in: categoryIds },
+            },
+            select: { id: true, name: true },
+          })
+        : [];
+  
+    const nameById = new Map(categories.map((c) => [c.id, c.name]));
+  
+    // 3) Build buckets
+    const items = grouped
+      .map((g) => {
+        const amountCents = g._sum.amountCents ?? 0;
+        const txCount = g._count?._all ?? 0;
+  
+        if (g.categoryId === null) {
+          return {
+            categoryId: null,
+            categoryName: "Uncategorized",
+            amountCents,
+            txCount,
+          };
+        }
+  
+        return {
+          categoryId: g.categoryId,
+          categoryName: nameById.get(g.categoryId) ?? "Unknown category",
+          amountCents,
+          txCount,
+        };
+      })
+      .sort((a, b) => b.amountCents - a.amountCents);
+  
+    const totalCents = items.reduce((acc, x) => acc + x.amountCents, 0);
+  
+    const itemsWithShare = items.map((x) => ({
+      ...x,
+      share: totalCents > 0 ? x.amountCents / totalCents : 0,
+    }));
+  
+    return {
+      from,
+      to,
+      type: type ?? null,
+      totalCents,
+      items: itemsWithShare,
+    };
+  }
 };
