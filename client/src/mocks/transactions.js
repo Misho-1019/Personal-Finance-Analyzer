@@ -1,0 +1,55 @@
+import { mockCategories } from "./categories";
+
+export const mockTransactions = {
+  items: [
+    {
+      id: "tx_1",
+      type: "INCOME",
+      amountCents: 500000,
+      date: "2024-02-14T10:00:00.000Z",
+      description: "Monthly Salary",
+      notes: "Bonus included",
+      category: mockCategories[2],
+    },
+    {
+      id: "tx_2",
+      type: "EXPENSE",
+      amountCents: 120000,
+      date: "2024-02-13T15:30:00.000Z",
+      description: "Rent Payment",
+      notes: "February rent",
+      category: mockCategories[1],
+    },
+    {
+      id: "tx_3",
+      type: "EXPENSE",
+      amountCents: 4550,
+      date: "2024-02-12T18:45:00.000Z",
+      description: "Lidl Groceries",
+      notes: null,
+      category: mockCategories[0],
+    },
+    {
+      id: "tx_4",
+      type: "EXPENSE",
+      amountCents: 1500,
+      date: "2024-02-11T09:00:00.000Z",
+      description: "Cinema Tickets",
+      notes: "Dune 2",
+      category: mockCategories[3],
+    },
+    {
+      id: "tx_5",
+      type: "EXPENSE",
+      amountCents: 8500,
+      date: "2024-02-10T11:20:00.000Z",
+      description: "Gas Station OMV",
+      notes: null,
+      category: mockCategories[4],
+    },
+  ],
+  page: 1,
+  pageSize: 20,
+  totalItems: 5,
+  totalPages: 1,
+};

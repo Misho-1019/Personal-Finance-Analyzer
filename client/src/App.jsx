@@ -1,26 +1,32 @@
 import "./App.css";
+import AppLayout from "./components/AppLayout";
+import AboutPage from "./pages/AboutPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import CategoriesPage from "./pages/CategoriesPage";
+import CategoryKeywordsPage from "./pages/CategoryKeywordsPage";
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
+import RegisterPage from "./pages/RegisterPage";
+import TransactionCreatePage from "./pages/TransactionCreatePage";
+import TransactionEditPage from "./pages/TransactionEditPage";
+import TransactionsListPage from "./pages/TransactionsListPage";
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <h1 className="text-2xl font-semibold text-slate-800 tracking-tight">
-            Personal Finance Analyzer
-          </h1>
-
-          <span className="text-sm text-slate-500">
-            Analytics Dashboard
-          </span>
-        </div>
-      </header>
-
-      <main className="max-w-6xl mx-auto px-6 py-8">
-        <h2 className="text-xl font-medium text-slate-700">
-          Welcome 👋
-        </h2>
-      </main>
-    </div>
+    <AppLayout >
+      {/* <LandingPage /> */}
+      {/* <AnalyticsPage /> */}
+      {/* <CategoriesPage /> */}
+      {/* <CategoryKeywordsPage /> */}
+      {/* <LoginPage /> */}
+      {/* <RegisterPage /> */}
+      {/* <TransactionCreatePage /> */}
+      {/* <TransactionEditPage /> */}
+      {/* <TransactionsListPage /> */}
+      {/* <AboutPage /> */}
+      <ProfilePage />
+    </AppLayout>
   )
 }
 
