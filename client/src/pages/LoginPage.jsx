@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router';
 
 const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -70,9 +71,9 @@ const LoginPage = () => {
         <div className="mt-8 pt-6 border-t border-slate-800 text-center">
           <p className="text-slate-400">
             Don't have an account?{' '}
-            <button className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors cursor-pointer">
+            <Link to='/register' className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors cursor-pointer">
               Register now
-            </button>
+            </Link>
           </p>
         </div>
       </div>

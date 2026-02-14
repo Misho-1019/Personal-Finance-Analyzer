@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
   return (
@@ -14,9 +15,9 @@ const LandingPage = () => {
           <button className="hover:text-slate-100 transition-colors cursor-pointer">Security</button>
           <button className="hover:text-slate-100 transition-colors cursor-pointer">About</button>
         </div>
-        <button className="text-sm font-semibold bg-slate-900 border border-slate-800 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all cursor-pointer">
+        <Link to='/login' className="text-sm font-semibold bg-slate-900 border border-slate-800 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all cursor-pointer">
           Log In
-        </button>
+        </Link>
       </nav>
 
       {/* Hero Section */}
@@ -31,12 +32,12 @@ const LandingPage = () => {
             The modern way to manage your personal wealth with precision and clarity.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-            <button className="w-full sm:w-auto bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 hover:from-indigo-600 hover:via-violet-600 hover:to-cyan-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all cursor-pointer">
+            <Link to='/register' className="w-full sm:w-auto bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 hover:from-indigo-600 hover:via-violet-600 hover:to-cyan-600 text-white font-bold py-4 px-10 rounded-2xl shadow-xl shadow-indigo-500/20 active:scale-[0.98] transition-all cursor-pointer">
               Get Started Free
-            </button>
-            <button className="w-full sm:w-auto bg-slate-900 border border-slate-800 text-slate-300 font-bold py-4 px-10 rounded-2xl hover:bg-slate-800 transition-all cursor-pointer">
+            </Link>
+            <Link to='/login' className="w-full sm:w-auto bg-slate-900 border border-slate-800 text-slate-300 font-bold py-4 px-10 rounded-2xl hover:bg-slate-800 transition-all cursor-pointer">
               Log In
-            </button>
+            </Link>
           </div>
         </div>
 

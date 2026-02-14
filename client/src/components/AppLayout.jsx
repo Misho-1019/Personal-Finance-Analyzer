@@ -1,35 +1,36 @@
 import React, { useState } from 'react';
+import { Link, Outlet } from "react-router";
 
 const AppLayout = ({ children, title = "Dashboard" }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
-    { name: 'Analytics', icon: (
+    { name: 'Analytics', path: '/dashboard', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
       </svg>
     )},
-    { name: 'Transactions', icon: (
+    { name: 'Transactions', path: '/transactions/list', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
       </svg>
     )},
-    { name: 'Categories', icon: (
+    { name: 'Categories', path: '/categories', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
       </svg>
     )},
-    { name: 'Category Keywords', icon: (
+    { name: 'Category Keywords', path: '/category-keywords', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
       </svg>
     )},
-    { name: 'Profile', icon: (
+    { name: 'Profile', path: '/profile', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
       </svg>
     )},
-    { name: 'About', icon: (
+    { name: 'About', path: '/about', icon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
@@ -42,7 +43,7 @@ const AppLayout = ({ children, title = "Dashboard" }) => {
       {/* Sidebar */}
       <aside 
         className={`fixed top-0 left-0 h-full bg-slate-950 border-r border-slate-800 transition-all duration-300 z-50 flex flex-col ${
-          isCollapsed ? 'w-[72px]' : 'w-[240px]'
+          isCollapsed ? 'w-18' : 'w-60'
         }`}
       >
         {/* Sidebar Header */}
@@ -62,7 +63,8 @@ const AppLayout = ({ children, title = "Dashboard" }) => {
         <nav className="flex-1 px-3 space-y-2">
            {navItems.map((item) => (
              <div key={item.name} className="relative group">
-               <button 
+               <Link 
+                  to={item.path}
                   className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all relative ${
                     item.name === title 
                     ? 'bg-linear-to-r from-indigo-500/20 via-violet-500/20 to-cyan-500/20 text-indigo-100 shadow-[inset_0_0_12px_rgba(99,102,241,0.1)] border border-indigo-500/20' 
@@ -80,11 +82,11 @@ const AppLayout = ({ children, title = "Dashboard" }) => {
                  {item.name === title && !isCollapsed && (
                     <div className="absolute left-0 w-1 h-5 bg-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.8)]"></div>
                  )}
-               </button>
+               </Link>
                
                {/* Tooltip for collapsed mode */}
                {isCollapsed && (
-                 <div className="absolute left-16 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-800 text-slate-100 text-[10px] font-bold uppercase tracking-widest rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-[100] border border-slate-700 shadow-2xl">
+                 <div className="absolute left-16 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-800 text-slate-100 text-[10px] font-bold uppercase tracking-widest rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-100 border border-slate-700 shadow-2xl">
                     {item.name}
                     <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-slate-800 border-l border-b border-slate-700 rotate-45"></div>
                  </div>
@@ -128,7 +130,7 @@ const AppLayout = ({ children, title = "Dashboard" }) => {
       {/* Main Content Area */}
       <main 
         className={`flex-1 transition-all duration-300 flex flex-col min-h-screen ${
-          isCollapsed ? 'pl-[72px]' : 'pl-[240px]'
+          isCollapsed ? 'pl-18' : 'pl-60'
         }`}
       >
         {/* Header */}
@@ -161,7 +163,8 @@ const AppLayout = ({ children, title = "Dashboard" }) => {
         <div className="bg-slate-900 rounded-tl-3xl border-t border-l border-slate-800 flex-1 relative">
            <div className="absolute inset-0 bg-linear-to-b from-slate-900 via-transparent to-transparent pointer-events-none rounded-tl-3xl"></div>
            <div className="max-w-7xl mx-auto px-6 py-10 relative z-10">
-             {children}
+             {/* {children} */}
+             <Outlet />
            </div>
         </div>
       </main>

@@ -1,3 +1,4 @@
+import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import AppLayout from "./components/AppLayout";
 import AboutPage from "./pages/AboutPage";
@@ -14,19 +15,22 @@ import TransactionsListPage from "./pages/TransactionsListPage";
 
 function App() {
   return (
-    <AppLayout >
-      {/* <LandingPage /> */}
-      {/* <AnalyticsPage /> */}
-      {/* <CategoriesPage /> */}
-      {/* <CategoryKeywordsPage /> */}
-      {/* <LoginPage /> */}
-      {/* <RegisterPage /> */}
-      {/* <TransactionCreatePage /> */}
-      {/* <TransactionEditPage /> */}
-      {/* <TransactionsListPage /> */}
-      {/* <AboutPage /> */}
-      <ProfilePage />
-    </AppLayout>
+    <Routes>
+      <Route path="/welcome" element={<LandingPage />}/>
+      <Route path="/login" element={<LoginPage />}/>
+      <Route path="/register" element={<RegisterPage />}/>
+
+      <Route element={ <AppLayout />}>
+        <Route path="/dashboard" element={<AnalyticsPage />}/>
+        <Route path="/categories" element={<CategoriesPage />}/>
+        <Route path="/category-keywords" element={<CategoryKeywordsPage />}/>
+        <Route path="/transactions/create" element={<TransactionCreatePage />}/>
+        <Route path="/transactions/update" element={<TransactionEditPage />}/>
+        <Route path="/transactions/list" element={<TransactionsListPage />}/>
+        <Route path="/about" element={<AboutPage />}/>
+        <Route path="/profile" element={<ProfilePage />}/>
+      </Route>
+    </Routes>
   )
 }
 
