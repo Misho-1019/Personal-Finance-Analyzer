@@ -1,24 +1,32 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useRegister } from '../api/authApi.js';
+import { UserContext } from '../context/UserContext.js';
 
 const RegisterPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-  });
+  const { register, isPending } = useRegister();
+  const { userLoginHandler } = useContext(UserContext)
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1500);
-  };
+  const registerHandler = async (formData) => {
+    const values = Object.fromEntries(formData)
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const confirmPassword = formData.get('repeatPassword')
+
+    if (confirmPassword !== values.password) {
+      console.log('Passwords mismatch!');
+      
+      return;
+    }
+
+    const authData = await register(values.firstName, values.lastName, values.email, values.password)
+
+    console.log(authData);
+
+    userLoginHandler(authData)
+
+    navigate('/dashboard')
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 font-sans">
@@ -31,15 +39,13 @@ const RegisterPage = () => {
           <p className="text-slate-400 mt-2">Create your account to start analyzing</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form action={registerHandler} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-400 mb-2">First Name</label>
               <input
                 type="text"
                 name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
                 placeholder="John"
                 autoComplete='firstName'
@@ -51,8 +57,6 @@ const RegisterPage = () => {
               <input
                 type="text"
                 name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
                 placeholder="Doe"
                 autoComplete='lastName'
@@ -66,8 +70,6 @@ const RegisterPage = () => {
             <input
               type="email"
               name="email"
-              value={formData.email}
-              onChange={handleChange}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               placeholder="john@example.com"
               autoComplete='email'
@@ -80,8 +82,6 @@ const RegisterPage = () => {
             <input
               type="password"
               name="password"
-              value={formData.password}
-              onChange={handleChange}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               placeholder="••••••••"
               autoComplete='current-password'
@@ -94,8 +94,6 @@ const RegisterPage = () => {
             <input
               type="password"
               name="repeatPassword"
-              value={formData.repeatPassword || ''}
-              onChange={handleChange}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               placeholder="••••••••"
               autoComplete='repeatPassword'
@@ -105,10 +103,10 @@ const RegisterPage = () => {
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
             className="w-full mt-4 bg-linear-to-r from-teal-400 via-cyan-400 to-indigo-500 hover:from-teal-500 hover:via-cyan-500 hover:to-indigo-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-teal-500/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Creating Account...' : 'Get Started'}
+            {isPending ? 'Creating Account...' : 'Get Started'}
           </button>
         </form>
 

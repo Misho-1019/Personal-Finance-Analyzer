@@ -24,3 +24,19 @@ export const useLogin = () => {
 
     return { login, isPending }
 }
+
+export const useRegister = () => {
+    const [isPending, setIsPending] = useState(false)
+    const abortRef = useRef(new AbortController())
+
+    const register = async (firstName, lastName, email, password) => 
+        setIsPending(true) || await request.post(`${baseUrl}/register`, { firstName, lastName, email, password }, { signal: abortRef.current.signal })
+
+    useEffect(() => {
+        const abortController = abortRef.current;
+
+        return () => abortController.abort();
+    }, [])
+
+    return { register, isPending }
+}
