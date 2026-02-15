@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import request from "../utils/requester.js";
+import { UserContext } from "../context/UserContext.js";
 
 const baseUrl = 'http://localhost:3030/auth';
 
@@ -39,4 +40,18 @@ export const useRegister = () => {
     }, [])
 
     return { register, isPending }
+}
+
+export const useLogout = () => {
+    const { token } = useContext(UserContext)
+
+    const options = {
+        headers: {
+            'X-Authorization': token
+        }
+    }
+
+    const logout = async () => await request.get(`${baseUrl}/logout`, null, options)
+
+    return { logout }
 }

@@ -14,6 +14,7 @@ import TransactionEditPage from "./pages/TransactionEditPage";
 import TransactionsListPage from "./pages/TransactionsListPage";
 import { useState } from "react";
 import { UserContext } from "./context/UserContext";
+import Logout from "./components/Logout";
 
 function App() {
   const [authData, setAuthData] = useState({})
@@ -38,6 +39,7 @@ function App() {
           <Route path="/transactions/list" element={<TransactionsListPage />}/>
           <Route path="/about" element={<AboutPage />}/>
           <Route path="/profile" element={<ProfilePage />}/>
+          <Route path="/logout" element={<Logout />}/>
         </Route>
       </Routes>
     </UserContext.Provider>
