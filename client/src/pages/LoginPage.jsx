@@ -1,18 +1,19 @@
-import React, { useActionState, useState } from 'react';
+import { useActionState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { useLogin } from '../api/authApi';
 
 const LoginPage = ({
   onLogin
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { login, isPending } = useLogin()
 
-  const loginHandler = (previousState, formData) => {
+  const loginHandler = async (_, formData) => {
     const values = Object.fromEntries(formData)
 
-    onLogin(values.email)
+    const authData = await login(values.email, values.password)
+
+    onLogin(authData)
 
     console.log(values);
 
@@ -21,7 +22,7 @@ const LoginPage = ({
     return values
   }
 
-  const [values, loginAction, isPending] = useActionState(loginHandler, {
+  const [_, loginAction, _isPending] = useActionState(loginHandler, {
     email: ' ',
     password: ' '
   })
@@ -43,8 +44,6 @@ const LoginPage = ({
             <input
               type="email"
               name='email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"
               placeholder="misho@finance.com"
               autoComplete='email'
@@ -57,8 +56,6 @@ const LoginPage = ({
             <input
               type="password"
               name='password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"
               placeholder="••••••••"
               autoComplete='current-password'
@@ -68,10 +65,10 @@ const LoginPage = ({
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
             className="w-full bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 hover:from-indigo-600 hover:via-violet-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? (
+            {isPending ? (
               <span className="flex items-center justify-center">
                 <svg className="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
