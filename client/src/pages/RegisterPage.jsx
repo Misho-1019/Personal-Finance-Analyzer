@@ -84,6 +84,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               placeholder="••••••••"
+              autoComplete='current-password'
               required
             />
           </div>
@@ -97,6 +98,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               placeholder="••••••••"
+              autoComplete='repeatPassword'
               required
             />
           </div>

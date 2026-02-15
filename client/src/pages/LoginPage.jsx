@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useActionState, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 const LoginPage = ({
@@ -9,15 +9,22 @@ const LoginPage = ({
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const loginAction = (formData) => {
-    const email = formData.get('email');
+  const loginHandler = (previousState, formData) => {
+    const values = Object.fromEntries(formData)
 
-    onLogin(email)
+    onLogin(values.email)
 
-    console.log(email);
-    
+    console.log(values);
+
     navigate('/dashboard')
+    
+    return values
   }
+
+  const [values, loginAction, isPending] = useActionState(loginHandler, {
+    email: ' ',
+    password: ' '
+  })
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 font-sans">
@@ -54,6 +61,7 @@ const LoginPage = ({
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"
               placeholder="••••••••"
+              autoComplete='current-password'
               required
             />
           </div>
