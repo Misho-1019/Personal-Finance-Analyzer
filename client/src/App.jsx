@@ -15,10 +15,10 @@ import TransactionsListPage from "./pages/TransactionsListPage";
 import { useState } from "react";
 
 function App() {
-  const [_email, setEmail] = useState('')
+  const [authData, setAuthData] = useState({})
 
-  const userLoginHandler = (authData) => {
-    setEmail(authData.email)
+  const userLoginHandler = (resultData) => {
+    setAuthData(resultData)
   }
 
   return (
