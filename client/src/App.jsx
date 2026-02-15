@@ -13,6 +13,7 @@ import TransactionCreatePage from "./pages/TransactionCreatePage";
 import TransactionEditPage from "./pages/TransactionEditPage";
 import TransactionsListPage from "./pages/TransactionsListPage";
 import { useState } from "react";
+import { UserContext } from "./context/UserContext";
 
 function App() {
   const [authData, setAuthData] = useState({})
@@ -22,22 +23,24 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/welcome" element={<LandingPage />}/>
-      <Route path="/login" element={<LoginPage onLogin={userLoginHandler} />}/>
-      <Route path="/register" element={<RegisterPage />}/>
-
-      <Route element={ <AppLayout />}>
-        <Route path="/dashboard" element={<AnalyticsPage />}/>
-        <Route path="/categories" element={<CategoriesPage />}/>
-        <Route path="/category-keywords" element={<CategoryKeywordsPage />}/>
-        <Route path="/transactions/create" element={<TransactionCreatePage />}/>
-        <Route path="/transactions/update" element={<TransactionEditPage />}/>
-        <Route path="/transactions/list" element={<TransactionsListPage />}/>
-        <Route path="/about" element={<AboutPage />}/>
-        <Route path="/profile" element={<ProfilePage />}/>
-      </Route>
-    </Routes>
+    <UserContext.Provider value={{ ...authData, userLoginHandler }}>
+      <Routes>
+        <Route path="/welcome" element={<LandingPage />}/>
+        <Route path="/login" element={<LoginPage onLogin={userLoginHandler} />}/>
+        <Route path="/register" element={<RegisterPage />}/>
+  
+        <Route element={ <AppLayout />}>
+          <Route path="/dashboard" element={<AnalyticsPage />}/>
+          <Route path="/categories" element={<CategoriesPage />}/>
+          <Route path="/category-keywords" element={<CategoryKeywordsPage />}/>
+          <Route path="/transactions/create" element={<TransactionCreatePage />}/>
+          <Route path="/transactions/update" element={<TransactionEditPage />}/>
+          <Route path="/transactions/list" element={<TransactionsListPage />}/>
+          <Route path="/about" element={<AboutPage />}/>
+          <Route path="/profile" element={<ProfilePage />}/>
+        </Route>
+      </Routes>
+    </UserContext.Provider>
   )
 }
 
