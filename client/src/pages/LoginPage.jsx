@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
-const LoginPage = () => {
+const LoginPage = ({
+  onLogin
+}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    // Mock login delay
-    setTimeout(() => setIsLoading(false), 1500);
-  };
+  const loginAction = (formData) => {
+    const email = formData.get('email');
+
+    onLogin(email)
+
+    console.log(email);
+    
+    navigate('/dashboard')
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 text-slate-100 font-sans">
@@ -24,15 +30,17 @@ const LoginPage = () => {
           <p className="text-slate-400 mt-2">Sign in to your financial command center</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form action={loginAction} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-slate-400 mb-2">Email</label>
             <input
               type="email"
+              name='email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"
               placeholder="misho@finance.com"
+              autoComplete='email'
               required
             />
           </div>
@@ -41,6 +49,7 @@ const LoginPage = () => {
             <label className="block text-sm font-medium text-slate-400 mb-2">Password</label>
             <input
               type="password"
+              name='password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 transition-all"

@@ -42,6 +42,7 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
                 placeholder="John"
+                autoComplete='firstName'
                 required
               />
             </div>
@@ -54,6 +55,7 @@ const RegisterPage = () => {
                 onChange={handleChange}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
                 placeholder="Doe"
+                autoComplete='lastName'
                 required
               />
             </div>
@@ -68,6 +70,7 @@ const RegisterPage = () => {
               onChange={handleChange}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               placeholder="john@example.com"
+              autoComplete='email'
               required
             />
           </div>
@@ -78,6 +81,19 @@ const RegisterPage = () => {
               type="password"
               name="password"
               value={formData.password}
+              onChange={handleChange}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-400 mb-2">Repeat Password</label>
+            <input
+              type="password"
+              name="repeatPassword"
+              value={formData.repeatPassword || ''}
               onChange={handleChange}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all"
               placeholder="••••••••"

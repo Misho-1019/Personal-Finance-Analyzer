@@ -12,12 +12,19 @@ import RegisterPage from "./pages/RegisterPage";
 import TransactionCreatePage from "./pages/TransactionCreatePage";
 import TransactionEditPage from "./pages/TransactionEditPage";
 import TransactionsListPage from "./pages/TransactionsListPage";
+import { useState } from "react";
 
 function App() {
+  const [_email, setEmail] = useState('')
+
+  const userLoginHandler = (email) => {
+    setEmail(email)
+  }
+
   return (
     <Routes>
       <Route path="/welcome" element={<LandingPage />}/>
-      <Route path="/login" element={<LoginPage />}/>
+      <Route path="/login" element={<LoginPage onLogin={userLoginHandler} />}/>
       <Route path="/register" element={<RegisterPage />}/>
 
       <Route element={ <AppLayout />}>
