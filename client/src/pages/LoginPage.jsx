@@ -1,7 +1,7 @@
 import { useActionState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useLogin } from '../api/authApi.js';
-import { useUserContext } from '../context/UserContext.js';
+import { useUserContext } from '../context/UserContext.jsx';
 
 const LoginPage = () => {
   const navigate = useNavigate();

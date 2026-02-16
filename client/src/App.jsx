@@ -14,6 +14,7 @@ import TransactionEditPage from "./pages/TransactionEditPage";
 import TransactionsListPage from "./pages/TransactionsListPage";
 import Logout from "./components/Logout";
 import { UserProvider } from "./providers/UserProvider";
+import AuthGuard from "./components/guards/AuthGuard";
 
 function App() {
 
@@ -25,15 +26,17 @@ function App() {
         <Route path="/register" element={<RegisterPage />}/>
   
         <Route element={ <AppLayout />}>
-          <Route path="/dashboard" element={<AnalyticsPage />}/>
-          <Route path="/categories" element={<CategoriesPage />}/>
-          <Route path="/category-keywords" element={<CategoryKeywordsPage />}/>
-          <Route path="/transactions/create" element={<TransactionCreatePage />}/>
-          <Route path="/transactions/update" element={<TransactionEditPage />}/>
-          <Route path="/transactions/list" element={<TransactionsListPage />}/>
-          <Route path="/about" element={<AboutPage />}/>
-          <Route path="/profile" element={<ProfilePage />}/>
-          <Route path="/logout" element={<Logout />}/>
+          <Route element={ <AuthGuard />}>
+            <Route path="/dashboard" element={<AnalyticsPage />}/>
+            <Route path="/categories" element={<CategoriesPage />}/>
+            <Route path="/category-keywords" element={<CategoryKeywordsPage />}/>
+            <Route path="/transactions/create" element={<TransactionCreatePage />}/>
+            <Route path="/transactions/update" element={<TransactionEditPage />}/>
+            <Route path="/transactions/list" element={<TransactionsListPage />}/>
+            <Route path="/about" element={<AboutPage />}/>
+            <Route path="/profile" element={<ProfilePage />}/>
+            <Route path="/logout" element={<Logout />}/>
+          </Route>
         </Route>
       </Routes>
     </UserProvider>
