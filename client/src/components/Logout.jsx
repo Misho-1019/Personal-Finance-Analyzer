@@ -8,7 +8,7 @@ export default function Logout() {
 
     useEffect(() => {
         if (isLoggedOut) {
-            showToast('you have been logged out successfully', 'success')
+            showToast('You have been logged out successfully', 'success')
         }
     }, [isLoggedOut])
 

@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { mockTransactions } from '../mocks/transactions';
 import { mockCategories } from '../mocks/categories';
+import { Link } from 'react-router';
+import transactionService from '../services/transactionService';
 
 const TransactionsListPage = () => {
+  const [transactions, setTransactions] = useState('')
   // const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     type: 'ALL',
@@ -22,6 +25,14 @@ const TransactionsListPage = () => {
     });
   };
 
+  useEffect(() => {
+    transactionService.list()
+      .then(setTransactions)
+  }, [])
+
+  console.log(transactions);
+  
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -31,12 +42,12 @@ const TransactionsListPage = () => {
             <h1 className="text-3xl font-bold tracking-tight">Transactions</h1>
             <p className="text-slate-400 mt-1">Review and manage your financial activity</p>
           </div>
-          <button className="bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 hover:from-indigo-600 hover:via-violet-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center gap-2">
+          <Link to='/transactions/create' className="bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 hover:from-indigo-600 hover:via-violet-600 hover:to-cyan-600 text-white font-semibold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
             Add Transaction
-          </button>
+          </Link>
         </div>
 
         {/* Filter Bar */}
