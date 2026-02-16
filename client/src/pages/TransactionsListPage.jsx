@@ -101,78 +101,92 @@ const TransactionsListPage = () => {
         </div>
 
         {/* Transactions Table Container */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left">
-              <thead>
-                <tr className="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider font-semibold">
-                  <th className="px-6 py-4">Date</th>
-                  <th className="px-6 py-4">Description</th>
-                  <th className="px-6 py-4">Category</th>
-                  <th className="px-6 py-4 text-right">Amount</th>
-                  <th className="px-6 py-4"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/50 text-sm">
-                {allTransactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-slate-800/30 transition-colors group">
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-400 font-medium">
-                      {formatDate(tx.date)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-slate-100 font-semibold">{tx.description}</span>
-                        {tx.notes && <span className="text-xs text-slate-500 truncate max-w-xs">{tx.notes}</span>}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {tx.category ? (
-                        <span 
-                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
-                          style={{ 
-                            backgroundColor: `${tx.category.color}20`, 
-                            color: tx.category.color,
-                            borderColor: `${tx.category.color}40`
-                          }}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: tx.category.color }}></span>
-                          {tx.category.name}
-                        </span>
-                      ) : (
-                        <span className="text-slate-600 italic">Uncategorized</span>
-                      )}
-                    </td>
-                    <td className={`px-6 py-4 text-right font-bold whitespace-nowrap ${tx.type === 'INCOME' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {tx.type === 'INCOME' ? '+' : '-'}{formatCents(tx.amountCents)}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                       <Link to={`/transactions/${tx.id}/update`} className="text-slate-500 hover:text-indigo-400 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                       </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination UI */}
-          <div className="px-6 py-4 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
-            <span className="text-sm text-slate-400">
-              Showing <span className="text-slate-200 font-semibold">1-5</span> of <span className="text-slate-200 font-semibold">5</span> transactions
-            </span>
-            <div className="flex items-center gap-2">
-              <button disabled className="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-500 rounded-lg text-xs font-bold opacity-50 cursor-not-allowed transition-all">
-                Previous
-              </button>
-              <button className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-500/20 transition-all">
-                Next
-              </button>
+        {allTransactions.length === 0 ? (
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-20 text-center shadow-2xl">
+              <p className="text-slate-400 text-sm mb-3">
+                You don’t have any transactions yet.
+              </p>
+              <Link
+                to="/transactions/create"
+                className="inline-block bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold px-4 py-2 rounded-lg hover:bg-indigo-500/20 transition-all"
+              >
+                Create Transaction
+              </Link>
             </div>
-          </div>
-        </div>
+        ) : (
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-slate-800/50 text-slate-400 text-xs uppercase tracking-wider font-semibold">
+                      <th className="px-6 py-4">Date</th>
+                      <th className="px-6 py-4">Description</th>
+                      <th className="px-6 py-4">Category</th>
+                      <th className="px-6 py-4 text-right">Amount</th>
+                      <th className="px-6 py-4"></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/50 text-sm">
+                    {allTransactions.map((tx) => (
+                      <tr key={tx.id} className="hover:bg-slate-800/30 transition-colors group">
+                        <td className="px-6 py-4 whitespace-nowrap text-slate-400 font-medium">
+                          {formatDate(tx.date)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex flex-col">
+                            <span className="text-slate-100 font-semibold">{tx.description}</span>
+                            {tx.notes && <span className="text-xs text-slate-500 truncate max-w-xs">{tx.notes}</span>}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {tx.category ? (
+                            <span 
+                              className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border"
+                              style={{ 
+                                backgroundColor: `${tx.category.color}20`, 
+                                color: tx.category.color,
+                                borderColor: `${tx.category.color}40`
+                              }}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full mr-2" style={{ backgroundColor: tx.category.color }}></span>
+                              {tx.category.name}
+                            </span>
+                          ) : (
+                            <span className="text-slate-600 italic">Uncategorized</span>
+                          )}
+                        </td>
+                        <td className={`px-6 py-4 text-right font-bold whitespace-nowrap ${tx.type === 'INCOME' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                          {tx.type === 'INCOME' ? '+' : '-'}{formatCents(tx.amountCents)}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                           <Link to={`/transactions/${tx.id}/update`} className="text-slate-500 hover:text-indigo-400 transition-colors">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                              </svg>
+                           </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+    
+              {/* Pagination UI */}
+              <div className="px-6 py-4 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
+                <span className="text-sm text-slate-400">
+                  Showing <span className="text-slate-200 font-semibold">1-5</span> of <span className="text-slate-200 font-semibold">5</span> transactions
+                </span>
+                <div className="flex items-center gap-2">
+                  <button disabled className="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-500 rounded-lg text-xs font-bold opacity-50 cursor-not-allowed transition-all">
+                    Previous
+                  </button>
+                  <button className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-500/20 transition-all">
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+        )}
       </div>
     </div>
   );
