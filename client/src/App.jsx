@@ -12,26 +12,16 @@ import RegisterPage from "./pages/RegisterPage";
 import TransactionCreatePage from "./pages/TransactionCreatePage";
 import TransactionEditPage from "./pages/TransactionEditPage";
 import TransactionsListPage from "./pages/TransactionsListPage";
-import { UserContext } from "./context/UserContext";
 import Logout from "./components/Logout";
-import usePersistedState from "./hooks/usePersistedState";
+import { UserProvider } from "./providers/UserProvider";
 
 function App() {
-  const [authData, setAuthData] = usePersistedState('auth', {})
-
-  const userLoginHandler = (resultData) => {
-    setAuthData(resultData)
-  }
-
-  const userLogoutHandler = () => {
-    setAuthData({})
-  }
 
   return (
-    <UserContext.Provider value={{ ...authData, userLoginHandler, userLogoutHandler }}>
+    <UserProvider>
       <Routes>
         <Route path="/welcome" element={<LandingPage />}/>
-        <Route path="/login" element={<LoginPage onLogin={userLoginHandler} />}/>
+        <Route path="/login" element={<LoginPage />}/>
         <Route path="/register" element={<RegisterPage />}/>
   
         <Route element={ <AppLayout />}>
@@ -46,7 +36,7 @@ function App() {
           <Route path="/logout" element={<Logout />}/>
         </Route>
       </Routes>
-    </UserContext.Provider>
+    </UserProvider>
   )
 }
 

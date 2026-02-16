@@ -1,11 +1,10 @@
-import { useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 import { useRegister } from '../api/authApi.js';
-import { UserContext } from '../context/UserContext.js';
+import { useUserContext } from '../context/UserContext.js';
 
 const RegisterPage = () => {
   const { register, isPending } = useRegister();
-  const { userLoginHandler } = useContext(UserContext)
+  const { userLoginHandler } = useUserContext();
   const navigate = useNavigate();
 
   const registerHandler = async (formData) => {

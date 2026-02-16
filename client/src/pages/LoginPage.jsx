@@ -1,12 +1,12 @@
-import { useActionState, useContext } from 'react';
+import { useActionState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useLogin } from '../api/authApi.js';
-import { UserContext } from '../context/UserContext.js';
+import { useUserContext } from '../context/UserContext.js';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const { login, isPending } = useLogin()
-  const { userLoginHandler} = useContext(UserContext)
+  const { userLoginHandler } = useUserContext()
 
   const loginHandler = async (_, formData) => {
     const values = Object.fromEntries(formData)
