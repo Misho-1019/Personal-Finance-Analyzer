@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, Outlet } from "react-router";
 
-const AppLayout = ({ children, title = "Dashboard" }) => {
+const AppLayout = ({ title = "Dashboard" }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navItems = [
@@ -98,12 +98,12 @@ const AppLayout = ({ children, title = "Dashboard" }) => {
         {/* Sidebar Footer / Toggle */}
         <div className="p-4 border-t border-slate-800 space-y-4">
            {!isCollapsed && (
-             <button className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/5 transition-all text-sm font-semibold">
+             <Link to='/logout' className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-rose-400 hover:bg-rose-500/5 transition-all text-sm font-semibold">
                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                </svg>
                Logout
-             </button>
+             </Link>
            )}
            {isCollapsed && (
              <button className="w-10 h-10 mx-auto flex items-center justify-center rounded-xl text-rose-500 hover:bg-rose-500/5 transition-all">

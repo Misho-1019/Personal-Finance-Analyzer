@@ -12,12 +12,12 @@ import RegisterPage from "./pages/RegisterPage";
 import TransactionCreatePage from "./pages/TransactionCreatePage";
 import TransactionEditPage from "./pages/TransactionEditPage";
 import TransactionsListPage from "./pages/TransactionsListPage";
-import { useState } from "react";
 import { UserContext } from "./context/UserContext";
 import Logout from "./components/Logout";
+import usePersistedState from "./hooks/usePersistedState";
 
 function App() {
-  const [authData, setAuthData] = useState({})
+  const [authData, setAuthData] = usePersistedState('auth', {})
 
   const userLoginHandler = (resultData) => {
     setAuthData(resultData)
