@@ -16,11 +16,13 @@ import Logout from "./components/Logout";
 import { UserProvider } from "./providers/UserProvider";
 import AuthGuard from "./components/guards/AuthGuard";
 import GuestGuard from "./components/guards/GuestGuard";
+import { ToastContainer } from "react-toastify";
 
 function App() {
 
   return (
     <UserProvider>
+      <ToastContainer />
       <Routes>
         <Route element={ <GuestGuard />}>
           <Route path="/welcome" element={<LandingPage />}/>
