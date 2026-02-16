@@ -15,15 +15,18 @@ import TransactionsListPage from "./pages/TransactionsListPage";
 import Logout from "./components/Logout";
 import { UserProvider } from "./providers/UserProvider";
 import AuthGuard from "./components/guards/AuthGuard";
+import GuestGuard from "./components/guards/GuestGuard";
 
 function App() {
 
   return (
     <UserProvider>
       <Routes>
-        <Route path="/welcome" element={<LandingPage />}/>
-        <Route path="/login" element={<LoginPage />}/>
-        <Route path="/register" element={<RegisterPage />}/>
+        <Route element={ <GuestGuard />}>
+          <Route path="/welcome" element={<LandingPage />}/>
+          <Route path="/login" element={<LoginPage />}/>
+          <Route path="/register" element={<RegisterPage />}/>
+        </Route>
   
         <Route element={ <AppLayout />}>
           <Route element={ <AuthGuard />}>
