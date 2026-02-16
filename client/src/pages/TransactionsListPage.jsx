@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { mockTransactions } from '../mocks/transactions';
+import { useEffect, useState } from 'react';
 import { mockCategories } from '../mocks/categories';
 import { Link } from 'react-router';
 import transactionService from '../services/transactionService';
+import { formatDate } from '../utils/date';
+import { formatCents } from '../utils/money';
 
 const TransactionsListPage = () => {
   const [transactions, setTransactions] = useState('')
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({
     type: 'ALL',
     categoryId: '',
@@ -15,23 +16,13 @@ const TransactionsListPage = () => {
     to: ''
   });
 
-  const formatCents = (cents) => `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
-  
-  const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
   useEffect(() => {
     transactionService.list()
       .then(setTransactions)
+      .finally(() => setIsLoading(false))
   }, [])
 
-  console.log(transactions);
-  
+  const allTransactions = transactions[0] || [];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
@@ -123,7 +114,7 @@ const TransactionsListPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50 text-sm">
-                {mockTransactions.items.map((tx) => (
+                {allTransactions.map((tx) => (
                   <tr key={tx.id} className="hover:bg-slate-800/30 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap text-slate-400 font-medium">
                       {formatDate(tx.date)}
@@ -151,15 +142,15 @@ const TransactionsListPage = () => {
                         <span className="text-slate-600 italic">Uncategorized</span>
                       )}
                     </td>
-                    <td className={`px-6 py-4 text-right font-bold whitespace-nowrap ${tx.type === 'INCOME' ? 'text-emerald-400' : 'text-slate-200'}`}>
+                    <td className={`px-6 py-4 text-right font-bold whitespace-nowrap ${tx.type === 'INCOME' ? 'text-emerald-400' : 'text-rose-400'}`}>
                       {tx.type === 'INCOME' ? '+' : '-'}{formatCents(tx.amountCents)}
                     </td>
                     <td className="px-6 py-4 text-right">
-                       <button className="text-slate-500 hover:text-indigo-400 transition-colors">
+                       <Link to={`/transactions/${tx.id}/update`} className="text-slate-500 hover:text-indigo-400 transition-colors">
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                           </svg>
-                       </button>
+                       </Link>
                     </td>
                   </tr>
                 ))}

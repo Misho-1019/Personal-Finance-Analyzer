@@ -36,7 +36,7 @@ function App() {
             <Route path="/categories" element={<CategoriesPage />}/>
             <Route path="/category-keywords" element={<CategoryKeywordsPage />}/>
             <Route path="/transactions/create" element={<TransactionCreatePage />}/>
-            <Route path="/transactions/update" element={<TransactionEditPage />}/>
+            <Route path="/transactions/:id/update" element={<TransactionEditPage />}/>
             <Route path="/transactions/list" element={<TransactionsListPage />}/>
             <Route path="/about" element={<AboutPage />}/>
             <Route path="/profile" element={<ProfilePage />}/>
