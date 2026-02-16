@@ -1,5 +1,4 @@
-const request = async (method, url, data) => {
-    let options = {};
+const request = async (method, url, data, options = {}) => {
 
     if (method !== 'GET') { options.method = method }
 
@@ -36,4 +35,5 @@ export default {
     put: request.bind(null, 'PUT'),
     patch: request.bind(null, 'PATCH'),
     delete: request.bind(null, 'DELETE'),
+    baseRequest: request,
 }
