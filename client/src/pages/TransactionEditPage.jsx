@@ -1,29 +1,36 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from "react-router";
-import { mockCategories } from '../mocks/categories';
-import { mockTransactions } from '../mocks/transactions';
 import transactionService from '../services/transactionService';
+import { turnDateFormat } from '../utils/date';
 
 const TransactionEditPage = () => {
-  const { transactionId } = useParams()
+  const { id: transactionId } = useParams()
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false);
-  const exampleTx = mockTransactions.items[2];
+  const [transaction, setTransaction] = useState('')
+  const [type, setType] = useState('')
+  const [isLoading, setIsLoading] = useState(false); 
   
-  const [formData, setFormData] = useState({
-    type: exampleTx.type,
-    amountCents: exampleTx.amountCents,
-    date: exampleTx.date.split('T')[0],
-    description: exampleTx.description,
-    notes: exampleTx.notes || '',
-    categoryId: exampleTx.category?.id || ''
-  });
+  useEffect(() => {
+    transactionService.getOne(transactionId)
+    .then(data => {
+      setTransaction(data);
+      setType(data.type)
+    })
+    .finally(() => setIsLoading(false))
+  }, [transactionId])
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 1000);
-  };
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-300">
+        Loading transaction...
+      </div>
+    );
+  }
+  console.log(transaction);
+
+  const defaultDate = transaction.date ? turnDateFormat(String(transaction.date)) : '';
+
+  const categoryInfo = transaction.category || {}
 
   const transactionDeleteClickHandler = async() => {
     const hasConfirm = confirm(`Are you sure you want to delete this transaction?`)
@@ -48,19 +55,21 @@ const TransactionEditPage = () => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+        <form className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
           <div className="flex gap-4 p-1 bg-slate-950 rounded-xl border border-slate-800">
             <button
               type="button"
-              onClick={() => setFormData({...formData, type: 'EXPENSE'})}
-              className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${formData.type === 'EXPENSE' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-lg shadow-rose-500/5' : 'text-slate-500 hover:text-slate-300'}`}
+              name='type'
+              onClick={() => setType('EXPENSE')}
+              className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${type === 'EXPENSE' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-lg shadow-rose-500/5' : 'text-slate-500 hover:text-slate-300'}`}
             >
               Expense
             </button>
             <button
               type="button"
-              onClick={() => setFormData({...formData, type: 'INCOME'})}
-              className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${formData.type === 'INCOME' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg shadow-emerald-500/5' : 'text-slate-500 hover:text-slate-300'}`}
+              name='type'
+              onClick={() => setType('INCOME')}
+              className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${type === 'INCOME' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg shadow-emerald-500/5' : 'text-slate-500 hover:text-slate-300'}`}
             >
               Income
             </button>
@@ -72,9 +81,9 @@ const TransactionEditPage = () => {
               <div className="relative">
                 <input
                   type="number"
+                  name='amountCents'
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all font-mono"
-                  value={formData.amountCents}
-                  onChange={(e) => setFormData({...formData, amountCents: e.target.value})}
+                  defaultValue={transaction.amountCents}
                   required
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-600 text-xs font-mono">CENTS</span>
@@ -85,9 +94,9 @@ const TransactionEditPage = () => {
               <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</label>
               <input
                 type="date"
+                name='date'
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
-                value={formData.date}
-                onChange={(e) => setFormData({...formData, date: e.target.value})}
+                defaultValue={defaultDate}
                 required
               />
             </div>
@@ -97,9 +106,9 @@ const TransactionEditPage = () => {
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</label>
             <input
               type="text"
+              name='description'
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
-              value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              defaultValue={transaction.description}
               required
             />
           </div>
@@ -108,12 +117,10 @@ const TransactionEditPage = () => {
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</label>
             <select
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all appearance-none"
-              value={formData.categoryId}
-              onChange={(e) => setFormData({...formData, categoryId: e.target.value})}
+              defaultValue={transaction.categoryId}
+              name='category'
             >
-              {mockCategories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
+              <option key={categoryInfo.id} defaultValue={categoryInfo.id}>{categoryInfo.name}</option>
             </select>
           </div>
 
@@ -121,8 +128,8 @@ const TransactionEditPage = () => {
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Notes</label>
             <textarea
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all min-h-25 resize-none"
-              value={formData.notes}
-              onChange={(e) => setFormData({...formData, notes: e.target.value})}
+              defaultValue={transaction.notes}
+              name='notes'
             />
           </div>
 

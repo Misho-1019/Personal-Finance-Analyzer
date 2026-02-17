@@ -13,6 +13,9 @@ export default {
     async create(transactionData, userId) {
         return request.post(baseUrl, { ...transactionData, userId })
     },
+    async getOne(transactionId) {
+        return request.get(`${baseUrl}/${transactionId}`)
+    },
     async delete(transactionId) {
         return request.delete(`${baseUrl}/${transactionId}`)
     }

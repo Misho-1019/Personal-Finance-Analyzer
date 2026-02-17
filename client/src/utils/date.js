@@ -5,3 +5,7 @@ export const formatDate = (dateStr) => {
     year: "numeric",
   });
 };
+
+export const turnDateFormat = (dateIso) => {
+  return dateIso.split('T')[0] 
+}
