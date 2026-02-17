@@ -12,5 +12,8 @@ export default {
     },
     async create(transactionData, userId) {
         return request.post(baseUrl, { ...transactionData, userId })
+    },
+    async delete(transactionId) {
+        return request.delete(`${baseUrl}/${transactionId}`)
     }
 }

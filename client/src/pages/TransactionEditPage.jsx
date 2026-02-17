@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Link, useNavigate, useParams } from "react-router";
 import { mockCategories } from '../mocks/categories';
 import { mockTransactions } from '../mocks/transactions';
+import transactionService from '../services/transactionService';
 
 const TransactionEditPage = () => {
+  const { transactionId } = useParams()
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false);
   const exampleTx = mockTransactions.items[2];
   
@@ -21,6 +25,16 @@ const TransactionEditPage = () => {
     setTimeout(() => setIsLoading(false), 1000);
   };
 
+  const transactionDeleteClickHandler = async() => {
+    const hasConfirm = confirm(`Are you sure you want to delete this transaction?`)
+
+    if (!hasConfirm) return
+
+    await transactionService.delete(transactionId)
+
+    navigate('/transactions/list')
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
       <div className="max-w-2xl mx-auto">
@@ -29,7 +43,7 @@ const TransactionEditPage = () => {
             <h1 className="text-3xl font-bold tracking-tight">Edit Transaction</h1>
             <p className="text-slate-400 mt-1">Modify an existing financial record</p>
           </div>
-          <button className="text-rose-400 hover:bg-rose-500/10 px-4 py-2 rounded-lg border border-rose-500/20 transition-all font-semibold text-sm">
+          <button onClick={transactionDeleteClickHandler} className="text-rose-400 hover:bg-rose-500/10 px-4 py-2 rounded-lg border border-rose-500/20 transition-all font-semibold text-sm">
              Delete Permanentely
           </button>
         </div>
@@ -113,12 +127,12 @@ const TransactionEditPage = () => {
           </div>
 
           <div className="pt-4 flex items-center justify-end gap-4">
-            <button
-              type="button"
+            <Link
+              to={-1}
               className="px-6 py-3 text-slate-400 hover:text-slate-200 font-medium transition-colors"
             >
               Cancel
-            </button>
+            </Link>
             <button
               type="submit"
               disabled={isLoading}
