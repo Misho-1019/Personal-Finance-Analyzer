@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const LandingPage = () => {
@@ -9,11 +8,6 @@ const LandingPage = () => {
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 rounded-lg shadow-[0_0_15px_rgba(99,102,241,0.3)]"></div>
           <span className="text-xl font-bold tracking-tight">Finance<span className="text-indigo-400">Analyzer</span></span>
-        </div>
-        <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
-          <button className="hover:text-slate-100 transition-colors cursor-pointer">Features</button>
-          <button className="hover:text-slate-100 transition-colors cursor-pointer">Security</button>
-          <button className="hover:text-slate-100 transition-colors cursor-pointer">About</button>
         </div>
         <Link to='/login' className="text-sm font-semibold bg-slate-900 border border-slate-800 px-5 py-2.5 rounded-xl hover:bg-slate-800 transition-all cursor-pointer">
           Log In
@@ -140,29 +134,125 @@ const LandingPage = () => {
       {/* Product Preview Section */}
       <section className="max-w-7xl mx-auto px-6 py-24">
         <div className="bg-slate-900 rounded-3xl border border-slate-800 p-1 md:p-4 shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-950/20 to-slate-950 p-12 flex items-end justify-center">
-             <div className="text-center z-10">
-                <button className="bg-white text-slate-950 font-bold py-3 px-8 rounded-xl shadow-lg hover:scale-105 transition-transform cursor-pointer">
-                  See All Features
-                </button>
-             </div>
-          </div>
           
+          {/* Gradient Glow Background Accent */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/10 blur-3xl rounded-full"></div>
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-500/10 blur-3xl rounded-full"></div>
+      
+          {/* CTA Overlay */}
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-slate-950/30 to-slate-950 p-12 flex items-end justify-center">
+            <div className="text-center z-10">
+              <p className="text-slate-300 text-sm mb-5 max-w-xl mx-auto">
+                Preview a sample dashboard: automated categorization, real-time summaries,
+                and clear visual insights.
+              </p>
+      
+              <Link
+                to="/register"
+                className="bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 
+                           hover:from-indigo-600 hover:via-violet-600 hover:to-cyan-600
+                           text-white font-bold py-3 px-8 rounded-xl shadow-xl shadow-indigo-500/20 
+                           hover:scale-105 transition-all inline-block"
+              >
+                See All Features
+              </Link>
+            </div>
+          </div>
+      
           {/* Mock Dashboard Preview */}
-          <div className="bg-slate-950 rounded-2xl border border-slate-800 h-125 overflow-hidden opacity-80 select-none">
-             <div className="p-8 space-y-8">
-                <div className="h-4 w-48 bg-slate-900 rounded-full"></div>
-                <div className="grid grid-cols-4 gap-6">
-                   <div className="h-32 bg-slate-900 rounded-2xl border border-slate-800/50"></div>
-                   <div className="h-32 bg-slate-900 rounded-2xl border border-slate-800/50"></div>
-                   <div className="h-32 bg-slate-900 rounded-2xl border border-slate-800/50"></div>
-                   <div className="h-32 bg-slate-900 rounded-2xl border border-slate-800/50"></div>
+          <div className="bg-slate-950 rounded-2xl border border-slate-800 h-125 overflow-hidden opacity-90 select-none relative">
+            
+            {/* Sample badge */}
+            <div className="absolute top-4 left-4 z-10">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase
+                               bg-indigo-500/10 border border-indigo-500/30 text-indigo-300">
+                Sample dashboard
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+              </span>
+            </div>
+      
+            <div className="p-8 space-y-8">
+              {/* Top Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { label: "Monthly Income", value: "+$5,200", color: "text-emerald-400", glow: "shadow-emerald-500/20" },
+                  { label: "Monthly Expenses", value: "-$2,140", color: "text-rose-400", glow: "shadow-rose-500/20" },
+                  { label: "Net", value: "+$3,060", color: "text-indigo-400", glow: "shadow-indigo-500/20" },
+                  { label: "Top Category", value: "Food • 28%", color: "text-cyan-400", glow: "shadow-cyan-500/20" },
+                ].map((c) => (
+                  <div
+                    key={c.label}
+                    className={`bg-slate-900 rounded-2xl border border-slate-800/50 p-5 
+                                hover:border-indigo-500/40 transition-all shadow-lg ${c.glow}`}
+                  >
+                    <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      {c.label}
+                    </p>
+                    <p className={`mt-2 text-lg font-extrabold ${c.color}`}>
+                      {c.value}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-600">
+                      Example • last 30 days
+                    </p>
+                  </div>
+                ))}
+              </div>
+      
+              {/* Charts Section */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                {/* Monthly Summary Chart */}
+                <div className="lg:col-span-2 bg-slate-900 rounded-2xl border border-slate-800/50 p-5 hover:border-violet-500/40 transition-all">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4">
+                    Monthly Summary
+                  </p>
+                  <div className="h-48 flex items-end gap-2">
+                    {[35, 55, 40, 70, 50, 65, 85, 45, 60, 52, 68, 78].map((h, i) => (
+                      <div
+                        key={i}
+                        className={`flex-1 rounded-t-sm transition-all duration-500 ${
+                          i === 6
+                            ? "bg-linear-to-t from-indigo-500 to-cyan-400 shadow-[0_0_12px_rgba(99,102,241,0.5)]"
+                            : "bg-slate-800"
+                        }`}
+                        style={{ height: `${h}%` }}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 gap-8">
-                   <div className="col-span-2 h-64 bg-slate-900 rounded-2xl border border-slate-800/50"></div>
-                   <div className="h-64 bg-slate-900 rounded-2xl border border-slate-800/50"></div>
+      
+                {/* Category Breakdown */}
+                <div className="bg-slate-900 rounded-2xl border border-slate-800/50 p-5 hover:border-cyan-500/40 transition-all">
+                  <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-4">
+                    Category Breakdown
+                  </p>
+                  <div className="space-y-4">
+                    {[
+                      { name: "Food", w: "72%", color: "bg-indigo-500" },
+                      { name: "Transport", w: "55%", color: "bg-violet-500" },
+                      { name: "Bills", w: "42%", color: "bg-cyan-500" },
+                      { name: "Shopping", w: "34%", color: "bg-slate-700" },
+                    ].map((c) => (
+                      <div key={c.name} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-400">{c.name}</span>
+                          <span className="text-slate-600">{c.w}</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                          <div className={`h-full ${c.color}`} style={{ width: c.w }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-             </div>
+      
+              </div>
+      
+              {/* Disclaimer */}
+              <p className="text-center text-xs text-slate-600">
+                Example data shown. Create an account to see your real analytics.
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -199,7 +289,7 @@ const LandingPage = () => {
            </div>
         </div>
         <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-800/50 text-center text-[10px] text-slate-600 uppercase tracking-widest font-bold">
-           © 2024 FinanceAnalyzer Dashboard — Premium Experience
+           © 2026 FinanceAnalyzer Dashboard — Premium Experience
         </div>
       </footer>
     </div>
