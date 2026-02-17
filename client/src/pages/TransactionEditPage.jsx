@@ -30,7 +30,17 @@ const TransactionEditPage = () => {
 
   const defaultDate = transaction.date ? turnDateFormat(String(transaction.date)) : '';
 
-  const categoryInfo = transaction.category || {}
+  const formatAction = async (formData) => {
+    const transactionData = Object.fromEntries(formData)
+
+    transactionData.amountCents = Number(transactionData.amountCents)
+
+    transactionData.categoryId = transactionData.categoryId || undefined
+
+    await transactionService.patch(transactionId, transactionData)
+
+    navigate('/transactions/list')
+  }
 
   const transactionDeleteClickHandler = async() => {
     const hasConfirm = confirm(`Are you sure you want to delete this transaction?`)
@@ -55,7 +65,7 @@ const TransactionEditPage = () => {
           </button>
         </div>
 
-        <form className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+        <form action={formatAction} className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
           <div className="flex gap-4 p-1 bg-slate-950 rounded-xl border border-slate-800">
             <button
               type="button"
@@ -117,10 +127,10 @@ const TransactionEditPage = () => {
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</label>
             <select
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all appearance-none"
-              defaultValue={transaction.categoryId}
-              name='category'
+              defaultValue={transaction.categoryId ?? ""}
+              name='categoryId'
             >
-              <option key={categoryInfo.id} defaultValue={categoryInfo.id}>{categoryInfo.name}</option>
+              <option value=''>No Category</option>
             </select>
           </div>
 

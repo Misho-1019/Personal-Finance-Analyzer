@@ -16,6 +16,9 @@ export default {
     async getOne(transactionId) {
         return request.get(`${baseUrl}/${transactionId}`)
     },
+    async patch(transactionId, transactionData) {
+        return request.patch(`${baseUrl}/${transactionId}`, transactionData)
+    },
     async delete(transactionId) {
         return request.delete(`${baseUrl}/${transactionId}`)
     }
