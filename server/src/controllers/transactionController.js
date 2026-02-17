@@ -40,6 +40,23 @@ transactionController.get('/', isAuth, validateRequest({ query: listTransactions
     }
 })
 
+transactionController.get('/:id', isAuth, validateRequest({ params: idParamsSchema }), async (req, res) => {
+    const userId = req.user.id;
+    const transactionId = req.validated.params.id;
+
+    try {
+        const result = await transactionService.getOne(userId, transactionId)
+
+        return res.status(200).json(result)
+    } catch (error) {
+        if (error.status) {
+            return res.status(error.status).json({ error: error.message })
+        }
+
+        return res.status(500).json({ error: 'Internal Server Error' })
+    }
+})
+
 transactionController.patch('/:id', isAuth, validateRequest({ body: updateTransactionSchema, params: idParamsSchema }), async (req, res) => {
     const userId = req.user.id;
     const transactionId = req.validated.params.id;
