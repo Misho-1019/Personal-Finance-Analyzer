@@ -113,6 +113,25 @@ export default {
             totalPages,
         }
     },
+    async getOne(userId, transactionId) {
+        const findTransaction = await prisma.transaction.findFirst({
+            where: {
+                userId,
+                id: transactionId
+            },
+            include: {
+                category: true
+            }
+        })
+
+        if (!findTransaction) {
+            const err = new Error('Transaction not found')
+            err.status = 404;
+            throw err;
+        }
+
+        return findTransaction
+    },
     async update(userId, transactionId, transactionData) {
         const findTransaction = await prisma.transaction.findFirst({
             where: { 
