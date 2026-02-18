@@ -6,8 +6,15 @@ import { formatDate } from '../utils/date';
 import { formatCents } from '../utils/money';
 
 const TransactionsListPage = () => {
-  const [transactions, setTransactions] = useState('')
+  const [transactions, setTransactions] = useState({
+    items: [],
+    page: 1,
+    pageSize: 20,
+    totalItems: 0,
+    totalPages: 1,
+  })
   const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1)
   const [filters, setFilters] = useState({
     type: 'ALL',
     categoryId: '',
@@ -16,13 +23,28 @@ const TransactionsListPage = () => {
     to: ''
   });
 
+  const pageSize = 5;
+
   useEffect(() => {
-    transactionService.list()
+    transactionService.list({ page, pageSize })
       .then(setTransactions)
       .finally(() => setIsLoading(false))
-  }, [])
+  }, [page, pageSize])
 
-  const allTransactions = transactions[0] || [];
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-300">
+        Loading transaction...
+      </div>
+    );
+  }
+
+  console.log(transactions);
+
+  const allTransactions = transactions.items || [];
+
+  const start = transactions.totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
+  const end = Math.min(page * pageSize, transactions.totalItems)
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
@@ -174,13 +196,13 @@ const TransactionsListPage = () => {
               {/* Pagination UI */}
               <div className="px-6 py-4 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
                 <span className="text-sm text-slate-400">
-                  Showing <span className="text-slate-200 font-semibold">1-5</span> of <span className="text-slate-200 font-semibold">5</span> transactions
+                  Showing <span className="text-slate-200 font-semibold">{start}-{end}</span> of <span className="text-slate-200 font-semibold">{transactions.totalItems}</span> transactions
                 </span>
                 <div className="flex items-center gap-2">
-                  <button disabled className="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-500 rounded-lg text-xs font-bold opacity-50 cursor-not-allowed transition-all">
+                  <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-4 py-2 bg-slate-800 border border-slate-700 text-slate-500 rounded-lg text-xs font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:transition-all">
                     Previous
                   </button>
-                  <button className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-500/20 transition-all">
+                  <button disabled={page >= transactions.totalPages} onClick={() => setPage((p) => p + 1)} className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded-lg text-xs font-bold hover:bg-indigo-500/20 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:text-slate-500 disabled:bg-slate-800 disabled:border-slate-700">
                     Next
                   </button>
                 </div>

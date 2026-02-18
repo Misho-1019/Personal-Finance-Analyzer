@@ -93,7 +93,7 @@ export default {
             })
         ])
 
-        const totalPages = Math.ceil(totalItems / pageSize)
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize))
 
         if (page > totalPages) {
             return {
