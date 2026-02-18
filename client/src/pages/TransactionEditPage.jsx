@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from "react-router";
 import transactionService from '../services/transactionService';
 import { turnDateFormat } from '../utils/date';
+import categoriesService from '../services/categoriesService';
 
 const TransactionEditPage = () => {
   const { id: transactionId } = useParams()
@@ -9,6 +10,7 @@ const TransactionEditPage = () => {
   const [transaction, setTransaction] = useState('')
   const [type, setType] = useState('')
   const [isLoading, setIsLoading] = useState(false); 
+  const [categories, setCategories] = useState([])
   
   useEffect(() => {
     transactionService.getOne(transactionId)
@@ -19,6 +21,11 @@ const TransactionEditPage = () => {
     .finally(() => setIsLoading(false))
   }, [transactionId])
 
+  useEffect(() => {
+    categoriesService.getCategories()
+      .then(setCategories)
+  }, [])
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-300">
@@ -26,7 +33,6 @@ const TransactionEditPage = () => {
       </div>
     );
   }
-  console.log(transaction);
 
   const defaultDate = transaction.date ? turnDateFormat(String(transaction.date)) : '';
 
@@ -35,6 +41,8 @@ const TransactionEditPage = () => {
 
     transactionData.amountCents = Number(transactionData.amountCents)
 
+    transactionData.description = transactionData.description || undefined
+    transactionData.notes = transactionData.notes || undefined
     transactionData.categoryId = transactionData.categoryId || undefined
 
     await transactionService.patch(transactionId, transactionData)
@@ -131,6 +139,10 @@ const TransactionEditPage = () => {
               name='categoryId'
             >
               <option value=''>No Category</option>
+
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
             </select>
           </div>
 
