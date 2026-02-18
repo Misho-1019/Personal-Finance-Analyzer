@@ -1,38 +1,93 @@
+const API_BASE = 'http://localhost:3030';
+
+let refreshPromise = null;
+
+async function refreshSession() {
+    if (!refreshPromise) {
+        refreshPromise = fetch(`${API_BASE}/auth/refresh`, {
+            method: 'POST',
+            credentials: 'include',
+        }).finally(() => {
+            refreshPromise = null
+        })
+    }
+
+    const response = await refreshPromise;
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({}))
+
+        throw {
+            message: error?.error || error?.message || 'Session expired!',
+            status: response.status
+        }
+    }
+}
+
 const request = async (method, url, data, options = {}) => {
+    const makeOptions = () => {
+        let finalOptions = {...options};
 
-    if (method !== 'GET') { options.method = method }
+        if (method !== 'GET') {
+            finalOptions.method = method
+        }
 
-    if (data) {
-        options = {
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers,
-            },
-            body: JSON.stringify(data)
+        
+        if (data) {
+            finalOptions = {
+                ...finalOptions,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...finalOptions.headers,
+                },
+                body: JSON.stringify(data)
+            }
+        }
+
+        return {
+            credentials: 'include',
+            ...finalOptions,
         }
     }
 
-    options = {
-        credentials: 'include',
-        ...options,
+    const doFetch = () => fetch(url, makeOptions())
+
+    let response = await doFetch()
+
+    const isRefreshCall = url === `${API_BASE}/auth/refresh`;
+    if (response.status === 401 && !isRefreshCall) {
+        await refreshSession();
+
+        response = await doFetch();
     }
 
-    const response = await fetch(url, options)
+    if (response.status === 204) {
+        return null
+    }
 
-    const responseContentType = response.headers.get('Content-Type') || '';
-
-    if (!responseContentType) return;
+    const contentType = response.headers.get('Content-Type') || '';
+    const isJson = contentType.includes('application/json')
 
     if (!response.ok) {
-        const error = await response.json()
+        let errorData = null;
 
-        throw error;
+        if (isJson) {
+            errorData = await response.json().catch(() => null)
+        }
+
+        throw (
+            errorData || {
+                message: `Request failed (${response.status})`,
+                status: response.status
+            }
+        )
     }
 
-    const result = await response.json()
+    if (!isJson) {
+        return null
+    }
 
-    return result;
+    return response.json();
 }
 
 export default {

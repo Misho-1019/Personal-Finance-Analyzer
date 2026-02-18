@@ -57,12 +57,12 @@ authController.post('/refresh', async (req, res) => {
         res.cookie('auth', accessToken.token, { httpOnly: true, sameSite: 'lax' })
         res.cookie('refresh', refreshToken, { httpOnly: true, sameSite: 'lax' })
 
-        return res.status(200).json({ message: 'Tokens refreshed successfully' })
+        return res.status(200).json({ userInfo: accessToken, message: 'Tokens refreshed successfully' })
     } catch (error) {
         res.clearCookie('auth')
         res.clearCookie('refresh')
 
-        return res.status(500).json({ error: error.message })
+        return res.status(401).json({ error: error.message })
     }
 })
 

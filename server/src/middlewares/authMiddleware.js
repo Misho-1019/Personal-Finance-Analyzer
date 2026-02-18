@@ -11,12 +11,11 @@ export const authMiddleware = (req, res, next) => {
         req.user = decodedToken;
         res.locals.user = decodedToken;
 
-        next()
     } catch (error) {
         res.clearCookie('auth')
-
-        return res.status(401).json({ error: 'Invalid or expired token' })
     }
+
+    next()
 }
 
 export const isAuth = (req, res, next) => {
