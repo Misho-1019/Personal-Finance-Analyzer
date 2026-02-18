@@ -62,7 +62,9 @@ export default {
             }
 
             if (to) {
-                mainWhere.date.lte = new Date(to)
+                const toDate = new Date(to)
+                toDate.setHours(23, 59, 59, 999)
+                mainWhere.date.lte = toDate;
             }
         }
 

@@ -1,20 +1,24 @@
-import { useEffect, useState } from 'react';
-import { mockCategories } from '../mocks/categories';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import transactionService from '../services/transactionService';
 import { formatDate } from '../utils/date';
 import { formatCents } from '../utils/money';
+import categoriesService from '../services/categoriesService';
+
+const PAGE_SIZE = 5;
 
 const TransactionsListPage = () => {
   const [transactions, setTransactions] = useState({
     items: [],
     page: 1,
-    pageSize: 20,
+    pageSize: PAGE_SIZE,
     totalItems: 0,
     totalPages: 1,
   })
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1)
+
   const [filters, setFilters] = useState({
     type: 'ALL',
     categoryId: '',
@@ -23,13 +27,43 @@ const TransactionsListPage = () => {
     to: ''
   });
 
-  const pageSize = 5;
+  const [categories, setCategories] = useState([])
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true)
 
   useEffect(() => {
-    transactionService.list({ page, pageSize })
+    setIsCategoriesLoading(true);
+    categoriesService.getCategories()
+      .then(setCategories)
+      .finally(() => setIsCategoriesLoading(false))
+  }, [])
+
+  useEffect(() => {
+    setPage(1);
+  }, [filters.type, filters.categoryId, filters.from, filters.to, filters.search])
+
+  const query = useMemo(() => {
+    return {
+      page,
+      pageSize: PAGE_SIZE,
+      type: filters.type !== 'ALL' ? filters.type : undefined,
+      categoryId: filters.categoryId || undefined,
+      from: filters.from || undefined,
+      to: filters.to || undefined
+    }
+  }, [page, filters.type, filters.categoryId, filters.from, filters.to])
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    transactionService.list(query)
       .then(setTransactions)
       .finally(() => setIsLoading(false))
-  }, [page, pageSize])
+  }, [query])
+
+  const allTransactions = transactions.items || [];
+
+  const start = transactions.totalItems === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const end = Math.min(page * PAGE_SIZE, transactions.totalItems)
 
   if (isLoading) {
     return (
@@ -38,13 +72,6 @@ const TransactionsListPage = () => {
       </div>
     );
   }
-
-  console.log(transactions);
-
-  const allTransactions = transactions.items || [];
-
-  const start = transactions.totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
-  const end = Math.min(page * pageSize, transactions.totalItems)
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
@@ -65,8 +92,8 @@ const TransactionsListPage = () => {
 
         {/* Filter Bar */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-             <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+             {/* <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Search</label>
                 <input 
                   type="text" 
@@ -75,7 +102,7 @@ const TransactionsListPage = () => {
                   value={filters.search}
                   onChange={(e) => setFilters({...filters, search: e.target.value})}
                 />
-             </div>
+             </div> */}
              <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Type</label>
                 <select 
@@ -94,9 +121,10 @@ const TransactionsListPage = () => {
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all appearance-none"
                   value={filters.categoryId}
                   onChange={(e) => setFilters({...filters, categoryId: e.target.value})}
+                  disabled={isCategoriesLoading}
                 >
                   <option value="">All Categories</option>
-                  {mockCategories.map(cat => (
+                  {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
