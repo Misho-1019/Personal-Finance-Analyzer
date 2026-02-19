@@ -29,6 +29,8 @@ const CategoriesPage = () => {
 
   const handleEdit = (cat) => {
     setSelectedCategory(cat);
+    setCategoryData({ name: cat.name })
+    setColor(cat.color || '#10b981')
     setShowModal(true);
   };
 
@@ -52,6 +54,32 @@ const CategoriesPage = () => {
       showToast('Category Created Successfully!', 'success')
     } catch (error) {
       showToast(error?.message || 'Failed to create category', 'error')
+    }
+  }
+
+  const updateCategoryClickHandler = async () => {
+    if (!selectedCategory) return;
+
+    const payload = {
+      name: categoryData.name.trim(),
+      color,
+    }
+
+    if (!payload.name) {
+      showToast('Name is required', 'error')
+      return;
+    }
+
+    try {
+      const updated = await categoriesService.updateCategory(selectedCategory.id, payload)
+
+      setCategories((prev) => prev.map((cat) => cat.id === selectedCategory.id ? updated : cat))
+  
+      setShowModal(false)
+      setSelectedCategory(null)
+      showToast('Category Updated Successfully!', 'success')
+    } catch (error) {
+      showToast(error?.message || 'Failed to update category', 'error')
     }
   }
 
@@ -180,8 +208,10 @@ const CategoriesPage = () => {
 
             <div className="flex gap-4 pt-4">
                <button onClick={() => setShowModal(false)} className="flex-1 px-6 py-3 text-slate-400 font-medium bg-slate-800/50 rounded-xl">Cancel</button>
-               <button className="flex-1 bg-linear-to-r from-indigo-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20">
-                 {selectedCategory ? 'Update' : 'Create'}
+               <button
+                onClick={selectedCategory ? updateCategoryClickHandler : createCategoryClickHandler} 
+                className="flex-1 bg-linear-to-r from-indigo-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20">
+                {selectedCategory ? 'Update' : 'Create'}
                </button>
             </div>
           </div>
