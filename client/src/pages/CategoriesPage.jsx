@@ -8,6 +8,7 @@ const CategoriesPage = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState([])
+  const [color, setColor] = useState('#10b981')
 
   useEffect(() => {
     setIsLoading(true);
@@ -105,6 +106,7 @@ const CategoriesPage = () => {
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Category Name</label>
                 <input 
                   type="text" 
+                  name='name'
                   defaultValue={selectedCategory?.name || ''}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                   placeholder="e.g. Groceries"
@@ -113,13 +115,29 @@ const CategoriesPage = () => {
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Pick a Color</label>
                 <div className="flex flex-wrap gap-2">
-                   {['#10b981', '#6366f1', '#22d3ee', '#f43f5e', '#f59e0b', '#ec4899', '#8b5cf6'].map(color => (
+                   {['#10b981', '#6366f1', '#22d3ee', '#f43f5e', '#f59e0b', '#ec4899', '#8b5cf6'].map((preset) => (
                      <button 
-                       key={color} 
-                       className={`w-8 h-8 rounded-full border-2 border-transparent hover:border-white transition-all`}
-                       style={{ backgroundColor: color }}
+                       key={preset}
+                       name='color'
+                       type='button'
+                       onClick={() => setColor(preset)}
+                       className={`w-8 h-8 rounded-full border-2 transition-all
+                         ${
+                           color === preset
+                             ? "border-white scale-110"
+                             : "border-transparent hover:border-white"
+                         }`}
+                       style={{ backgroundColor: preset }}
                      ></button>
                    ))}
+                   
+                   {/* Custom Color Picker */}
+                   <input
+                     type="color"
+                     value={color}
+                     onChange={(e) => setColor(e.target.value)}
+                     className="w-8 h-8 rounded-full overflow-hidden cursor-pointer border-2 border-slate-700"
+                   />
                 </div>
               </div>
             </div>
