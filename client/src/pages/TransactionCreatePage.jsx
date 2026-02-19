@@ -1,14 +1,24 @@
-import { useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router";
-import { mockCategories } from '../mocks/categories';
 import useAuth from '../hooks/useAuth';
 import transactionService from '../services/transactionService';
+import categoriesService from '../services/categoriesService';
 
 const TransactionCreatePage = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [type, setType] = useState('EXPENSE');
   const { userId } = useAuth()
+  const [categories, setCategories] = useState([])
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    categoriesService.getCategories()
+      .then(setCategories)
+      .finally(() => setIsLoading(false))
+  }, [])
 
   const submitAction = async (formData) => {
     const transactionData = Object.fromEntries(formData)
@@ -22,7 +32,7 @@ const TransactionCreatePage = () => {
       notes: transactionData.notes?.trim() || undefined,
     }
 
-    const transaction = await transactionService.create({ ...payload }, userId)
+    await transactionService.create({ ...payload }, userId)
     
     navigate('/transactions/list')
   }
@@ -98,7 +108,7 @@ const TransactionCreatePage = () => {
               name='categoryId'
             >
               <option value="">Select Category (Optional)</option>
-              {mockCategories.map(cat => (
+              {categories.map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
