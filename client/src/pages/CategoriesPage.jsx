@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
-import { mockCategories } from '../mocks/categories';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from 'react';
+import categoriesService from '../services/categoriesService';
 
 const CategoriesPage = () => {
+  const [isLoading, setIsLoading] = useState(true)
   const [showModal, setShowModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [categories, setCategories] = useState([])
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    categoriesService.getCategories()
+      .then(setCategories)
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  console.log(categories);
 
   const handleCreate = () => {
     setSelectedCategory(null);
@@ -15,6 +28,14 @@ const CategoriesPage = () => {
     setSelectedCategory(cat);
     setShowModal(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-300">
+        Loading categories...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
@@ -47,7 +68,7 @@ const CategoriesPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50 text-sm font-medium">
-                {mockCategories.map((cat) => (
+                {categories.map((cat) => (
                   <tr key={cat.id} className="hover:bg-slate-800/30 transition-colors">
                     <td className="px-6 py-4">
                       <div 
