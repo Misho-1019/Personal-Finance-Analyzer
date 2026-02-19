@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 import categoriesService from '../services/categoriesService';
+import { showToast } from '../utils/toastUtils';
 
 const CategoriesPage = () => {
   const [isLoading, setIsLoading] = useState(true)
@@ -9,6 +10,7 @@ const CategoriesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categories, setCategories] = useState([])
   const [color, setColor] = useState('#10b981')
+  const [categoryData, setCategoryData] = useState({name: ''})
 
   useEffect(() => {
     setIsLoading(true);
@@ -18,10 +20,10 @@ const CategoriesPage = () => {
       .finally(() => setIsLoading(false))
   }, [])
 
-  console.log(categories);
-
   const handleCreate = () => {
     setSelectedCategory(null);
+    setCategoryData({ name: '' })
+    setColor('#10b981')
     setShowModal(true);
   };
 
@@ -29,6 +31,29 @@ const CategoriesPage = () => {
     setSelectedCategory(cat);
     setShowModal(true);
   };
+
+  const createCategoryClickHandler = async () => {
+    const payload = {
+      name: categoryData.name.trim(),
+      color,
+    }
+
+    if (!payload.name) {
+      showToast('Name is required', 'error')
+      return;
+    }
+
+    try {
+      const created = await categoriesService.createCategory(payload)
+
+      setCategories((prev) => [created, ...prev])
+  
+      setShowModal(false)
+      showToast('Category Created Successfully!', 'success')
+    } catch (error) {
+      showToast(error?.message || 'Failed to create category', 'error')
+    }
+  }
 
   if (isLoading) {
     return (
@@ -107,7 +132,8 @@ const CategoriesPage = () => {
                 <input 
                   type="text" 
                   name='name'
-                  defaultValue={selectedCategory?.name || ''}
+                  onChange={(e) => setCategoryData((prev) => ({ ...prev, name: e.target.value }))}
+                  value={categoryData.name}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                   placeholder="e.g. Groceries"
                 />
@@ -139,6 +165,16 @@ const CategoriesPage = () => {
                      className="w-8 h-8 rounded-full overflow-hidden cursor-pointer border-2 border-slate-700"
                    />
                 </div>
+              </div>
+
+              {/* Selected Color Preview */}
+              <div className="mt-3 flex items-center gap-2">
+                <span className="text-xs text-slate-400">Selected:</span>
+                <div
+                  className="w-6 h-6 rounded-full border border-slate-700"
+                  style={{ backgroundColor: color }}
+                />
+                <span className="text-xs text-slate-300">{color}</span>
               </div>
             </div>
 
