@@ -83,6 +83,22 @@ const CategoriesPage = () => {
     }
   }
 
+  const deleteCategoryClickHandler = async () => {
+    if (!selectedCategory) return;
+
+    try {
+      await categoriesService.deleteCategory(selectedCategory.id)
+
+      setCategories((prev) => prev.filter((c) => c.id !== selectedCategory.id))
+
+      setSelectedCategory(null)
+      setShowDeleteConfirm(false)
+      showToast('Category Deleted!', 'success')
+    } catch (error) {
+      showToast(error?.message || 'Failed to delete category', 'error')
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-300">
@@ -138,7 +154,7 @@ const CategoriesPage = () => {
                     </td>
                     <td className="px-6 py-4 text-right space-x-3">
                        <button onClick={() => handleEdit(cat)} className="text-slate-400 hover:text-indigo-400 transition-colors">Edit</button>
-                       <button onClick={() => setShowDeleteConfirm(true)} className="text-slate-500 hover:text-rose-400 transition-colors font-medium">Delete</button>
+                       <button onClick={() => {setShowDeleteConfirm(true); setSelectedCategory(cat)}} className="text-slate-500 hover:text-rose-400 transition-colors font-medium">Delete</button>
                     </td>
                   </tr>
                 ))}
@@ -232,8 +248,8 @@ const CategoriesPage = () => {
                 <p className="text-slate-400 mt-2 text-sm leading-relaxed">All transactions in this category will become uncategorized. This action is irreversible.</p>
               </div>
               <div className="flex gap-4 pt-2">
-                 <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 px-6 py-2 text-slate-300 font-medium">Wait, Keep it</button>
-                 <button className="flex-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold py-2 px-6 rounded-lg">Yes, Delete</button>
+                 <button onClick={() => {setShowDeleteConfirm(false); setSelectedCategory(null)}} className="flex-1 px-6 py-2 text-slate-300 font-medium">Wait, Keep it</button>
+                 <button onClick={deleteCategoryClickHandler} className="flex-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold py-2 px-6 rounded-lg">Yes, Delete</button>
               </div>
            </div>
         </div>
