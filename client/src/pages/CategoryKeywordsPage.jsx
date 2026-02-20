@@ -1,10 +1,14 @@
-import React, { useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import React, { useEffect, useState } from 'react';
 import { mockKeywords } from '../mocks/keywords';
 import { mockCategories } from '../mocks/categories';
+import categoryKeywordService from '../services/categoryKeywordService';
 
 const CategoryKeywordsPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState(null);
+  const [keywords, setKeywords] = useState([])
+  const [isLoading, setIsLoading] = useState(true);
 
   const getCategoryName = (id) => mockCategories.find(c => c.id === id)?.name || 'Unknown';
 
@@ -12,6 +16,24 @@ const CategoryKeywordsPage = () => {
     setSelectedKeyword(null);
     setShowModal(true);
   };
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    categoryKeywordService.getKeywords()
+      .then(setKeywords)
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  console.log(keywords);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-300">
+        Loading keywords...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
@@ -33,7 +55,7 @@ const CategoryKeywordsPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockKeywords.map((kw) => (
+          {keywords.map((kw) => (
             <div key={kw.id} className="bg-slate-900 border border-slate-800 p-6 rounded-2xl flex flex-col justify-between group hover:border-slate-700 transition-all shadow-xl">
               <div className="flex justify-between items-start">
                 <div>
