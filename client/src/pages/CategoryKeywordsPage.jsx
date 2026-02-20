@@ -1,17 +1,18 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState } from 'react';
-import { mockKeywords } from '../mocks/keywords';
 import { mockCategories } from '../mocks/categories';
 import categoryKeywordService from '../services/categoryKeywordService';
+import categoriesService from "../services/categoriesService";
 
 const CategoryKeywordsPage = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState(null);
   const [keywords, setKeywords] = useState([])
+  const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true);
 
-  const getCategoryName = (id) => mockCategories.find(c => c.id === id)?.name || 'Unknown';
-
+  
   const handleCreate = () => {
     setSelectedKeyword(null);
     setShowModal(true);
@@ -21,11 +22,20 @@ const CategoryKeywordsPage = () => {
     setIsLoading(true);
 
     categoryKeywordService.getKeywords()
-      .then(setKeywords)
-      .finally(() => setIsLoading(false))
+    .then(setKeywords)
+    .finally(() => setIsLoading(false))
   }, [])
-
-  console.log(keywords);
+  
+  useEffect(() => {
+    setIsLoading(true);
+    
+    categoriesService.getCategories()
+    .then(setCategories)
+    .finally(() => setIsLoading(false))
+  }, [])
+  
+  console.log(categories);
+  const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Unknown';
 
   if (isLoading) {
     return (
@@ -62,7 +72,7 @@ const CategoryKeywordsPage = () => {
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1">Keyword</p>
                   <h3 className="text-xl font-bold text-white">"{kw.keyword}"</h3>
                 </div>
-                <button className="text-slate-500 hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100 p-1">
+                <button onClick={() => {setShowDeleteConfirm(true); setSelectedKeyword(kw)}} className="text-slate-500 hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100 p-1">
                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                      <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                    </svg>
@@ -124,6 +134,29 @@ const CategoryKeywordsPage = () => {
                </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation UI */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+           <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center space-y-6">
+              <div className="w-16 h-16 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center mx-auto">
+                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                 </svg>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Delete Category Keyword?</h3>
+                <p className="text-slate-400 mt-2 text-sm leading-relaxed">
+                  Transactions will no longer be automatically assigned to this category when this keyword is detected. This action cannot be undone.
+                </p>
+              </div>
+              <div className="flex gap-4 pt-2">
+                 <button onClick={() => {setShowDeleteConfirm(false); setSelectedKeyword(null)}} className="flex-1 px-6 py-2 text-slate-300 font-medium cursor-pointer">Wait, Keep it</button>
+                 <button className="flex-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold py-2 px-6 rounded-lg cursor-pointer">Yes, Delete</button>
+              </div>
+           </div>
         </div>
       )}
     </div>
