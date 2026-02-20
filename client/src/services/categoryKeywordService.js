@@ -8,5 +8,8 @@ export default {
     },
     async createKeyword(keywordData) {
         return await request.post(baseUrl, keywordData)
+    },
+    async deleteKeyword(keywordId) {
+        return await request.delete(`${baseUrl}/${keywordId}`)
     }
 }

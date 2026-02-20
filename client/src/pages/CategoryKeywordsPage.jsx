@@ -39,7 +39,6 @@ const CategoryKeywordsPage = () => {
   }, [])
   
   const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Unknown';
-  console.log(category);
 
   const createKeywordClickHandler = async () => {
     const payload = {
@@ -60,6 +59,22 @@ const CategoryKeywordsPage = () => {
       showToast('Category Keyword successfully created!', 'success')
     } catch (error) {
       showToast(error?.message || 'Failed to create category keyword', 'error')
+    }
+  }
+
+  const deleteKeywordClickHandler = async () => {
+    if (!selectedKeyword) return;
+
+    try {
+      await categoryKeywordService.deleteKeyword(selectedKeyword.id)
+
+      setKeywords((prev) => prev.filter((k) => k.id !== selectedKeyword.id))
+
+      setSelectedKeyword(null)
+      setShowDeleteConfirm(false)
+      showToast('Category Keyword Deleted!', 'success')
+    } catch (error) {
+      showToast(error?.message || 'Failed to delete category keyword', 'error')
     }
   }
 
@@ -182,7 +197,7 @@ const CategoryKeywordsPage = () => {
               </div>
               <div className="flex gap-4 pt-2">
                  <button onClick={() => {setShowDeleteConfirm(false); setSelectedKeyword(null)}} className="flex-1 px-6 py-2 text-slate-300 font-medium cursor-pointer">Wait, Keep it</button>
-                 <button className="flex-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold py-2 px-6 rounded-lg cursor-pointer">Yes, Delete</button>
+                 <button onClick={deleteKeywordClickHandler} className="flex-1 bg-rose-500/10 border border-rose-500/20 text-rose-400 font-bold py-2 px-6 rounded-lg cursor-pointer">Yes, Delete</button>
               </div>
            </div>
         </div>
