@@ -8,6 +8,8 @@ const AnalyticsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filterType, setFilterType] = useState('EXPENSE');
   const [monthlySummary, setMonthlySummary] = useState({})
+  const [dateFilters, setDateFilters] = useState({ from: '', to: '' })
+  
   const monthsLength = useMemo(() => {
     if (!monthlySummary.from || !monthlySummary.to) return 0;
     return getMonthDifference(monthlySummary.to, monthlySummary.from) + 1;
@@ -34,6 +36,19 @@ const AnalyticsPage = () => {
     fetchMonthlySummary()
   }, [])
 
+  const applyDateFilters = () => {
+    if (dateFilters.from && dateFilters.to && dateFilters.from > dateFilters.to) {
+      fetchMonthlySummary({ from: dateFilters.to, to: dateFilters.from })
+      return;
+    }
+
+    fetchMonthlySummary(dateFilters)
+  }
+
+  const clearDateFilters = () => {
+    setDateFilters({ from: '', to: '' })
+    fetchMonthlySummary();
+  }
 
   const formatCents = (cents) => `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
 
@@ -73,6 +88,66 @@ const AnalyticsPage = () => {
             >
               Expense
             </button>
+          </div>
+
+        {/* Date filters bar */}
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div className="flex flex-col lg:flex-row gap-4 lg:items-end lg:justify-between">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    From
+                  </label>
+                  <input
+                    type="date"
+                    value={dateFilters.from}
+                    onChange={(e) =>
+                      setDateFilters((prev) => ({ ...prev, from: e.target.value }))
+                    }
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    To
+                  </label>
+                  <input
+                    type="date"
+                    value={dateFilters.to}
+                    onChange={(e) =>
+                      setDateFilters((prev) => ({ ...prev, to: e.target.value }))
+                    }
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={clearDateFilters}
+                  className="px-4 py-2.5 bg-slate-800/50 border border-slate-700 text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-800 transition-all"
+                >
+                  Reset
+                </button>
+                <button
+                  onClick={applyDateFilters}
+                  className="px-4 py-2.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 rounded-xl text-sm font-semibold hover:bg-indigo-500/20 transition-all"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-4 text-xs text-slate-500">
+              Showing{" "}
+              <span className="text-slate-300 font-semibold">
+                {monthlySummary.from || "—"}
+              </span>{" "}
+              to{" "}
+              <span className="text-slate-300 font-semibold">
+                {monthlySummary.to || "—"}
+              </span>
+            </div>
           </div>
         </div>
 
