@@ -1,11 +1,49 @@
-import React, { useState } from 'react';
-import { mockMonthlySummary, mockCategoriesSummary } from '../mocks/analytics';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useMemo, useState } from 'react';
+import { mockCategoriesSummary } from '../mocks/analytics';
+import analyticsService from '../services/analyticsService';
+import { getMonthDifference } from '../utils/date';
 
 const AnalyticsPage = () => {
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [filterType, setFilterType] = useState('EXPENSE');
+  const [monthlySummary, setMonthlySummary] = useState({})
+  const monthsLength = useMemo(() => {
+    if (!monthlySummary.from || !monthlySummary.to) return 0;
+    return getMonthDifference(monthlySummary.to, monthlySummary.from) + 1;
+  }, [monthlySummary.from, monthlySummary.to]);
+
+  const fetchMonthlySummary = async ({from, to} = {}) => {
+    setIsLoading(true)
+
+    try {
+      const data = await analyticsService.getMonthlySummary({
+        from: from || undefined,
+        to: to || undefined,
+      })
+  
+      setMonthlySummary(data)
+  
+      setDateFilters({ from: data.from, to: data.to })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchMonthlySummary()
+  }, [])
+
 
   const formatCents = (cents) => `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-300">
+        Loading analytics...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 p-8 font-sans">
@@ -42,8 +80,8 @@ const AnalyticsPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <p className="text-slate-400 text-sm font-medium">Total Net Balance</p>
-            <h2 className={`text-2xl font-bold mt-2 ${mockMonthlySummary.totalNetCents >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-              {formatCents(mockMonthlySummary.totalNetCents)}
+            <h2 className={`text-2xl font-bold mt-2 ${monthlySummary.totalNetCents >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {formatCents(monthlySummary.totalNetCents)}
             </h2>
             <div className="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
                <div className="h-full bg-linear-to-r from-indigo-500 to-cyan-400 w-3/4"></div>
@@ -52,14 +90,14 @@ const AnalyticsPage = () => {
           <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <p className="text-slate-400 text-sm font-medium">Monthly Income</p>
             <h2 className="text-2xl font-bold mt-2 text-indigo-300">
-              {formatCents(mockMonthlySummary.totalIncomeCents)}
+              {formatCents(monthlySummary.totalIncomeCents)}
             </h2>
             <p className="text-xs text-slate-500 mt-2">+12% from last period</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <p className="text-slate-400 text-sm font-medium">Monthly Expenses</p>
             <h2 className="text-2xl font-bold mt-2 text-rose-400ish text-orange-300">
-              {formatCents(mockMonthlySummary.totalExpenseCents)}
+              {formatCents(monthlySummary.totalExpenseCents)}
             </h2>
             <p className="text-xs text-slate-500 mt-2">-4% from last period</p>
           </div>
@@ -71,12 +109,12 @@ const AnalyticsPage = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
             <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
               Monthly Trends
-              <span className="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Last 6 Months</span>
+              <span className="text-xs font-normal text-slate-400 bg-slate-800 px-2 py-0.5 rounded">Last {monthsLength <= 1 ? `${monthsLength} Month` : `${monthsLength} Months`}</span>
             </h3>
             
             {/* Chart Placeholder */}
             <div className="h-64 flex items-end justify-between gap-1 mb-6">
-              {mockMonthlySummary.periods.map((p, i) => (
+              {monthlySummary.periods.map((p, i) => (
                 <div key={p.period} className="flex-1 flex flex-col items-center gap-2">
                   <div className="w-full flex justify-center items-end gap-1 h-48">
                     <div 
@@ -104,7 +142,7 @@ const AnalyticsPage = () => {
                   </tr>
                 </thead>
                 <tbody className="text-slate-300">
-                  {mockMonthlySummary.periods.map(period => (
+                  {monthlySummary.periods.map(period => (
                     <tr key={period.period} className="border-b border-slate-800/50 hover:bg-slate-800/30">
                       <td className="py-3 font-medium">{period.period}</td>
                       <td className="py-3 text-right text-emerald-400/80">{formatCents(period.incomeCents)}</td>
