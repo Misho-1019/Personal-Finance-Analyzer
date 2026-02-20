@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import React, { useEffect, useState } from 'react';
-import { mockCategories } from '../mocks/categories';
+import { useEffect, useState } from 'react';
 import categoryKeywordService from '../services/categoryKeywordService';
 import categoriesService from "../services/categoriesService";
+import { showToast } from '../utils/toastUtils';
 
 const CategoryKeywordsPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -11,10 +11,14 @@ const CategoryKeywordsPage = () => {
   const [keywords, setKeywords] = useState([])
   const [categories, setCategories] = useState([])
   const [isLoading, setIsLoading] = useState(true);
+  const [keywordData, setKeywordData] = useState({ keyword: '' })
+  const [category, setCategory] = useState('cmlitmb870004esv443bfg999')
 
   
   const handleCreate = () => {
     setSelectedKeyword(null);
+    setKeywordData({ keyword: '' })
+    setCategory('cmlitmb870004esv443bfg999')
     setShowModal(true);
   };
 
@@ -34,8 +38,30 @@ const CategoryKeywordsPage = () => {
     .finally(() => setIsLoading(false))
   }, [])
   
-  console.log(categories);
   const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Unknown';
+  console.log(category);
+
+  const createKeywordClickHandler = async () => {
+    const payload = {
+      keyword: keywordData.keyword.trim(),
+      categoryId: category,
+    }
+
+    if (!payload.keyword || !payload.categoryId) {
+      showToast('Category Keyword and ID are required!', 'error')
+    }
+
+    try {
+      const newKeyword = await categoryKeywordService.createKeyword(payload)
+  
+      setKeywords((prev) => [...prev, newKeyword])
+  
+      setShowModal(false)
+      showToast('Category Keyword successfully created!', 'success')
+    } catch (error) {
+      showToast(error?.message || 'Failed to create category keyword', 'error')
+    }
+  }
 
   if (isLoading) {
     return (
@@ -111,6 +137,8 @@ const CategoryKeywordsPage = () => {
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Keyword</label>
                 <input 
                   type="text" 
+                  onChange={(e) => setKeywordData((prev) => ({ ...prev, keyword: e.target.value }))}
+                  value={keywordData.keyword}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                   placeholder="e.g. Amazon"
                 />
@@ -119,8 +147,8 @@ const CategoryKeywordsPage = () => {
               
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Target Category</label>
-                <select className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 appearance-none">
-                  {mockCategories.map(cat => (
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 appearance-none">
+                  {categories.map(cat => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
@@ -129,7 +157,7 @@ const CategoryKeywordsPage = () => {
 
             <div className="flex gap-4 pt-4">
                <button onClick={() => setShowModal(false)} className="flex-1 px-6 py-3 text-slate-400 font-medium bg-slate-800/50 rounded-xl transition-all hover:bg-slate-800">Cancel</button>
-               <button className="flex-1 bg-linear-to-r from-indigo-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all">
+               <button onClick={createKeywordClickHandler} className="flex-1 bg-linear-to-r from-indigo-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all">
                  Create Rule
                </button>
             </div>

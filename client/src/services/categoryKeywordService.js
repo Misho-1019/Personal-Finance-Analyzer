@@ -5,5 +5,8 @@ const baseUrl = 'http://localhost:3030/category-keywords';
 export default {
     async getKeywords() {
         return await request.get(baseUrl)
+    },
+    async createKeyword(keywordData) {
+        return await request.post(baseUrl, keywordData)
     }
 }
