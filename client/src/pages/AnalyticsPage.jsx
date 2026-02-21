@@ -1,14 +1,13 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from 'react';
-import { mockCategoriesSummary } from '../mocks/analytics';
 import analyticsService from '../services/analyticsService';
 import { getMonthDifference } from '../utils/date';
 
 const AnalyticsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filterType, setFilterType] = useState('EXPENSE');
-  const [monthlySummary, setMonthlySummary] = useState({})
-  const [dateFilters, setDateFilters] = useState({ from: '', to: '' })
+  const [monthlySummary, setMonthlySummary] = useState({});
+  const [categoriesSummary, setCategoriesSummary] = useState({});
+  const [dateFilters, setDateFilters] = useState({ from: '', to: '' });
   
   const monthsLength = useMemo(() => {
     if (!monthlySummary.from || !monthlySummary.to) return 0;
@@ -27,30 +26,114 @@ const AnalyticsPage = () => {
       setMonthlySummary(data)
   
       setDateFilters({ from: data.from, to: data.to })
+
+      return data;
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchCategoriesSummary = async ({from, to, type} = {}) => {
+    if (!from || !to) return;
+
+    try {
+      const data = await analyticsService.getCategoriesSummary({
+        from: from,
+        to: to,
+        type: type === "ALL" ? undefined : type,
+      })
+
+      setCategoriesSummary(data)
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchMonthlySummary()
+    (async () => {
+      setIsLoading(true);
+      try {
+        const ms = await fetchMonthlySummary();
+        await fetchCategoriesSummary({ from: ms.from, to: ms.to, type: filterType === "ALL" ? undefined : filterType, })
+      } finally {
+        setIsLoading(false)
+      }
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const applyDateFilters = () => {
-    if (dateFilters.from && dateFilters.to && dateFilters.from > dateFilters.to) {
-      fetchMonthlySummary({ from: dateFilters.to, to: dateFilters.from })
-      return;
-    }
+  const applyDateFilters = async () => {
+    setIsLoading(true);
 
-    fetchMonthlySummary(dateFilters)
+    try {
+      if (dateFilters.from && dateFilters.to) {
+        const from = dateFilters.from <= dateFilters.to ? dateFilters.from : dateFilters.to;
+        const to = dateFilters.from <= dateFilters.to ? dateFilters.to : dateFilters.from;
+
+        await fetchMonthlySummary({ from, to })
+
+        await fetchCategoriesSummary({ from, to, type: filterType === "ALL" ? undefined : filterType, })
+        return
+      }
+  
+      const ms = await fetchMonthlySummary()
+      await fetchCategoriesSummary({ from: ms.from, to: ms.to, type: filterType === "ALL" ? undefined : filterType, })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const clearDateFilters = () => {
-    setDateFilters({ from: '', to: '' })
-    fetchMonthlySummary();
+  const clearDateFilters = async () => {
+    setIsLoading(true);
+
+    try {
+      setDateFilters({ from: '', to: '' })
+      
+      const ms = await fetchMonthlySummary()
+      await fetchCategoriesSummary({ from: ms.from, to: ms.to, type: filterType === "ALL" ? undefined : filterType, })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const formatCents = (cents) => `$${(cents / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+
+  useEffect(() => {
+    if (!monthlySummary.from || !monthlySummary.to) return;
+  
+    fetchCategoriesSummary({
+      from: monthlySummary.from,
+      to: monthlySummary.to,
+      type: filterType,
+    });
+  }, [filterType, monthlySummary.from, monthlySummary.to]);
+
+  const visiblePeriods = useMemo(() => {
+    const periods = monthlySummary.periods || [];
+
+    if (filterType === 'ALL') return periods;
+
+    return periods.map((p) => {
+      if (filterType === 'INCOME') {
+        return { ...p, expenseCents: 0, netCents: p.incomeCents }
+      }
+
+      return { ...p, incomeCents: 0, netCents: -p.expenseCents }
+    })
+  }, [monthlySummary.periods, filterType])
+
+  const incomeChangePercent = useMemo(() => {
+    const periods = monthlySummary.periods || [];
+
+    if (periods.length < 2) return null;
+
+    const last = periods[periods.length - 1];
+    const prev = periods[periods.length - 2];
+
+    if (!prev.incomeCents) return null;
+
+    return ((last.incomeCents - prev.incomeCents) / prev.incomeCents) * 100;
+  }, [monthlySummary.periods])
 
   if (isLoading) {
     return (
@@ -89,9 +172,10 @@ const AnalyticsPage = () => {
               Expense
             </button>
           </div>
+        </div>
 
         {/* Date filters bar */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <div className="flex flex-col lg:flex-row gap-4 lg:items-end lg:justify-between">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1">
                 <div>
@@ -148,7 +232,6 @@ const AnalyticsPage = () => {
                 {monthlySummary.to || "—"}
               </span>
             </div>
-          </div>
         </div>
 
         {/* KPI Cards */}
@@ -159,7 +242,21 @@ const AnalyticsPage = () => {
               {formatCents(monthlySummary.totalNetCents)}
             </h2>
             <div className="mt-4 h-1 w-full bg-slate-800 rounded-full overflow-hidden">
-               <div className="h-full bg-linear-to-r from-indigo-500 to-cyan-400 w-3/4"></div>
+              <div
+                className="h-full bg-linear-to-r from-indigo-500 to-cyan-400 transition-all duration-700"
+                style={{
+                  width: `${
+                    monthlySummary.totalIncomeCents > 0
+                      ? Math.min(
+                          100,
+                          (monthlySummary.totalNetCents /
+                            monthlySummary.totalIncomeCents) *
+                            100
+                        )
+                      : 0
+                  }%`,
+                }}
+              ></div>
             </div>
           </div>
           <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
@@ -167,7 +264,18 @@ const AnalyticsPage = () => {
             <h2 className="text-2xl font-bold mt-2 text-indigo-300">
               {formatCents(monthlySummary.totalIncomeCents)}
             </h2>
-            <p className="text-xs text-slate-500 mt-2">+12% from last period</p>
+            {incomeChangePercent !== null && (
+              <p
+                className={`text-xs mt-2 flex items-center gap-1 ${
+                  incomeChangePercent >= 0
+                    ? "text-emerald-400"
+                    : "text-rose-400"
+                }`}
+              >
+                {incomeChangePercent >= 0 ? "▲" : "▼"}
+                {Math.abs(incomeChangePercent).toFixed(1)}% vs last month
+              </p>
+            )}
           </div>
           <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <p className="text-slate-400 text-sm font-medium">Monthly Expenses</p>
@@ -189,7 +297,7 @@ const AnalyticsPage = () => {
             
             {/* Chart Placeholder */}
             <div className="h-64 flex items-end justify-between gap-1 mb-6">
-              {monthlySummary.periods.map((p, i) => (
+              {visiblePeriods.map((p) => (
                 <div key={p.period} className="flex-1 flex flex-col items-center gap-2">
                   <div className="w-full flex justify-center items-end gap-1 h-48">
                     <div 
@@ -217,7 +325,7 @@ const AnalyticsPage = () => {
                   </tr>
                 </thead>
                 <tbody className="text-slate-300">
-                  {monthlySummary.periods.map(period => (
+                  {visiblePeriods.map(period => (
                     <tr key={period.period} className="border-b border-slate-800/50 hover:bg-slate-800/30">
                       <td className="py-3 font-medium">{period.period}</td>
                       <td className="py-3 text-right text-emerald-400/80">{formatCents(period.incomeCents)}</td>
@@ -258,13 +366,13 @@ const AnalyticsPage = () => {
                     </defs>
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-bold">{formatCents(mockCategoriesSummary.totalCents).split('.')[0]}</span>
+                    <span className="text-2xl font-bold">{formatCents(categoriesSummary.totalCents).split('.')[0]}</span>
                     <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Spent</span>
                   </div>
                </div>
 
                <div className="flex-1 space-y-4 w-full">
-                  {mockCategoriesSummary.items.map((item, idx) => (
+                  {categoriesSummary?.items?.map((item, idx) => (
                     <div key={item.categoryId || item.categoryName} className="space-y-1">
                       <div className="flex justify-between text-xs">
                         <span className="text-slate-300 font-medium">{item.categoryName}</span>
@@ -291,7 +399,7 @@ const AnalyticsPage = () => {
                   </tr>
                 </thead>
                 <tbody className="text-slate-300">
-                  {mockCategoriesSummary.items.map(item => (
+                  {categoriesSummary?.items?.map(item => (
                     <tr key={item.categoryId || item.categoryName} className="border-b border-slate-800/50 hover:bg-slate-800/30">
                       <td className="py-3">
                         <div className="flex items-center gap-2">

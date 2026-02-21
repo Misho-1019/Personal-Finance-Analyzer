@@ -10,5 +10,14 @@ export default {
         if (to) params.set('to', to);
 
         return await request.get(`${baseUrl}/monthly-summary?${params.toString()}`)
+    },
+    async getCategoriesSummary({ from, to, type } = {}) {
+        const params = new URLSearchParams();
+
+        params.set('from', from);
+        params.set('to', to);
+        if (type) params.set('type', type);
+
+        return await request.get(`${baseUrl}/categories-summary?${params.toString()}`)
     }
 }
