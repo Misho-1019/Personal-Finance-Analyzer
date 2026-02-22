@@ -79,16 +79,6 @@ const TransactionsListPage = () => {
         {/* Filter Bar */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
-             {/* <div>
-                <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Search</label>
-                <input 
-                  type="text" 
-                  placeholder="Filter description..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all"
-                  value={filters.search}
-                  onChange={(e) => setFilters({...filters, search: e.target.value})}
-                />
-             </div> */}
              <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Type</label>
                 <select 
