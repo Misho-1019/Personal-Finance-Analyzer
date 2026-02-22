@@ -4,7 +4,7 @@ import { getMonthDifference } from '../utils/date';
 
 const AnalyticsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [filterType, setFilterType] = useState('EXPENSE');
+  const [filterType, setFilterType] = useState('ALL');
   const [monthlySummary, setMonthlySummary] = useState({});
   const [categoriesSummary, setCategoriesSummary] = useState({});
   const [dateFilters, setDateFilters] = useState({ from: '', to: '' });

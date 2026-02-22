@@ -1,15 +1,14 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router";
-import useAuth from '../hooks/useAuth';
-import transactionService from '../services/transactionService';
 import categoriesService from '../services/categoriesService';
+import { useCreateTransaction } from '../api/transactionsApi';
 
 const TransactionCreatePage = () => {
   const navigate = useNavigate();
+  const { create } = useCreateTransaction()
   const [isLoading, setIsLoading] = useState(true);
   const [type, setType] = useState('EXPENSE');
-  const { userId } = useAuth()
   const [categories, setCategories] = useState([])
 
   useEffect(() => {
@@ -32,7 +31,7 @@ const TransactionCreatePage = () => {
       notes: transactionData.notes?.trim() || undefined,
     }
 
-    await transactionService.create({ ...payload }, userId)
+    await create({ ...payload })
     
     navigate('/transactions/list')
   }
