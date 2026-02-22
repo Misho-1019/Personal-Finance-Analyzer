@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from "react-router";
 
 const AboutPage = () => {
   return (
@@ -206,16 +207,16 @@ const AboutPage = () => {
                  <p className="text-indigo-100/70 font-medium">Join thousands of users organizing their financial destiny today.</p>
                </div>
                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-                  <button className="w-full sm:w-auto bg-white text-indigo-600 font-black py-4 px-10 rounded-2xl shadow-xl hover:scale-105 transition-transform cursor-pointer">
+                  <Link to='/dashboard' className="w-full sm:w-auto bg-white text-indigo-600 font-black py-4 px-10 rounded-2xl shadow-xl hover:scale-105 transition-transform cursor-pointer">
                     Explore Dashboard
-                  </button>
-                  <button className="w-full sm:w-auto bg-indigo-800/40 text-white font-black py-4 px-10 rounded-2xl hover:bg-indigo-800/60 transition-all border border-indigo-400/30 cursor-pointer backdrop-blur-sm">
-                    Create Account
-                  </button>
+                  </Link>
+                  <Link to='/transactions/create' className="w-full sm:w-auto bg-indigo-800/40 text-white font-black py-4 px-10 rounded-2xl hover:bg-indigo-800/60 transition-all border border-indigo-400/30 cursor-pointer backdrop-blur-sm">
+                    Create Transaction
+                  </Link>
                </div>
             </div>
             <p className="mt-12 text-[10px] text-slate-700 uppercase tracking-[0.2em] font-black">
-               © 2024 FinanceAnalyzer — Built for Excellence
+               © 2026 FinanceAnalyzer — Built for Excellence
             </p>
         </section>
       </div>

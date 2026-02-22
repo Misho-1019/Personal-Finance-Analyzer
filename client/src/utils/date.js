@@ -19,3 +19,12 @@ export const getMonthDifference = (date1Str, date2Str) => {
 
   return Math.abs(years * 12 + months);
 }
+
+export function formatPeriodLabel(period) {
+  // period: "YYYY-MM"
+  if (!period || typeof period !== "string") return "—";
+  const [y, m] = period.split("-").map(Number);
+  if (!y || !m) return period;
+  const d = new Date(Date.UTC(y, m - 1, 1));
+  return d.toLocaleDateString(undefined, { month: "short", year: "numeric" });
+}

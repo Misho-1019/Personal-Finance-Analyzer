@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Link, Outlet } from "react-router";
+import useAuth from '../hooks/useAuth';
 
 const AppLayout = ({ title = "Dashboard" }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { firstName, lastName, email } = useAuth()
 
   const navItems = [
     { name: 'Analytics', path: '/dashboard', icon: (
@@ -136,25 +138,31 @@ const AppLayout = ({ title = "Dashboard" }) => {
         {/* Header */}
         <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-8 sticky top-0 z-40">
            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">
-             {title}
+             {/* {title} */}
            </h2>
            <div className="flex items-center gap-6">
-              <button className="text-slate-500 hover:text-indigo-400 transition-colors">
+              <Link to='/profile' className="text-slate-500 hover:text-indigo-400 transition-colors">
                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                  </svg>
-              </button>
+              </Link>
               <div className="flex items-center gap-3">
-                 <div className="text-right hidden sm:block">
-                    <p className="text-xs font-bold text-slate-100 uppercase tracking-wider leading-none mb-1">Misho Admin</p>
-                    <p className="text-[10px] text-emerald-400/80 font-bold leading-none">Pro Plan</p>
-                 </div>
-                 <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-cyan-500 p-0.5">
-                    <div className="w-full h-full rounded-[10px] bg-slate-900 flex items-center justify-center text-xs font-black text-slate-200 uppercase">
-                       MA
-                    </div>
-                 </div>
+                <div className="text-right hidden sm:block">
+                  <p className="text-xs font-bold text-slate-100 uppercase tracking-wider leading-none mb-1">
+                    {firstName || lastName ? `${firstName || ""} ${lastName || ""}`.trim() : "Guest"}
+                  </p>
+                  <p className="text-[10px] text-emerald-400/80 font-bold leading-none">
+                    {email ? "Pro Plan" : "Signed out"}
+                  </p>
+                </div>
+              
+                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-indigo-500 to-cyan-500 p-0.5">
+                  <div className="w-full h-full rounded-[10px] bg-slate-900 flex items-center justify-center text-xs font-black text-slate-200 uppercase">
+                    {(firstName?.[0] || "U")}
+                    {(lastName?.[0] || "S")}
+                  </div>
+                </div>
               </div>
            </div>
         </header>
