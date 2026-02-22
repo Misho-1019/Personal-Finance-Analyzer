@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import request from "../utils/requester.js";
 import useAuth from "../hooks/useAuth.js";
 import { useEffect, useState } from "react";
@@ -86,4 +87,19 @@ export const useTransactions = (filters = {}) => {
     }, [JSON.stringify(filters)])
 
     return { isLoading, transactions }
+}
+
+export const useTransaction = (transactionId) => {
+    const [isLoading, setIsLoading] = useState(true)
+    const [transaction, setTransaction] = useState('')
+
+    useEffect(() => {
+        setIsLoading(true);
+        
+        request.get(`${baseUrl}/${transactionId}`)
+          .then(setTransaction)
+          .finally(() => setIsLoading(false))
+    }, [transactionId])
+
+    return { isLoading, transaction }
 }

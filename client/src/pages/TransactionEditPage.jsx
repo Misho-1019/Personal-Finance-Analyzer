@@ -1,25 +1,21 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from "react-router";
 import transactionService from '../services/transactionService';
 import { turnDateFormat } from '../utils/date';
 import categoriesService from '../services/categoriesService';
+import { useTransaction } from '../api/transactionsApi';
 
 const TransactionEditPage = () => {
   const { id: transactionId } = useParams()
   const navigate = useNavigate()
-  const [transaction, setTransaction] = useState('')
-  const [type, setType] = useState('')
-  const [isLoading, setIsLoading] = useState(false); 
+  const { isLoading, transaction } = useTransaction(transactionId)
+  const [type, setType] = useState('EXPENSE')
   const [categories, setCategories] = useState([])
-  
+
   useEffect(() => {
-    transactionService.getOne(transactionId)
-    .then(data => {
-      setTransaction(data);
-      setType(data.type)
-    })
-    .finally(() => setIsLoading(false))
-  }, [transactionId])
+    if (transaction?.type) setType(transaction.type)
+  }, [transaction?.type])
 
   useEffect(() => {
     categoriesService.getCategories()
@@ -74,6 +70,8 @@ const TransactionEditPage = () => {
         </div>
 
         <form action={formatAction} className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
+          <input type="hidden" name="type" value={type} />
+          
           <div className="flex gap-4 p-1 bg-slate-950 rounded-xl border border-slate-800">
             <button
               type="button"
