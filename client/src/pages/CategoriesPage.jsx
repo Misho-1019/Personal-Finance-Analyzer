@@ -1,24 +1,15 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import categoriesService from '../services/categoriesService';
 import { showToast } from '../utils/toastUtils';
+import { useGetCategories } from '../api/categoriesApi';
 
 const CategoriesPage = () => {
-  const [isLoading, setIsLoading] = useState(true)
   const [showModal, setShowModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [categories, setCategories] = useState([])
+  const { categories, isCategoriesLoading, refetch } = useGetCategories();
   const [color, setColor] = useState('#10b981')
   const [categoryData, setCategoryData] = useState({name: ''})
-
-  useEffect(() => {
-    setIsLoading(true);
-
-    categoriesService.getCategories()
-      .then(setCategories)
-      .finally(() => setIsLoading(false))
-  }, [])
 
   const handleCreate = () => {
     setSelectedCategory(null);
@@ -46,9 +37,9 @@ const CategoriesPage = () => {
     }
 
     try {
-      const created = await categoriesService.createCategory(payload)
+      await categoriesService.createCategory(payload)
 
-      setCategories((prev) => [created, ...prev])
+      await refetch();
   
       setShowModal(false)
       showToast('Category Created Successfully!', 'success')
@@ -71,9 +62,9 @@ const CategoriesPage = () => {
     }
 
     try {
-      const updated = await categoriesService.updateCategory(selectedCategory.id, payload)
+      await categoriesService.updateCategory(selectedCategory.id, payload)
 
-      setCategories((prev) => prev.map((cat) => cat.id === selectedCategory.id ? updated : cat))
+      await refetch()
   
       setShowModal(false)
       setSelectedCategory(null)
@@ -89,7 +80,7 @@ const CategoriesPage = () => {
     try {
       await categoriesService.deleteCategory(selectedCategory.id)
 
-      setCategories((prev) => prev.filter((c) => c.id !== selectedCategory.id))
+      await refetch();
 
       setSelectedCategory(null)
       setShowDeleteConfirm(false)
@@ -99,7 +90,7 @@ const CategoriesPage = () => {
     }
   }
 
-  if (isLoading) {
+  if (isCategoriesLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-300">
         Loading categories...
@@ -138,7 +129,7 @@ const CategoriesPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50 text-sm font-medium">
-                {categories.map((cat) => (
+                {(categories || []).map((cat) => (
                   <tr key={cat.id} className="hover:bg-slate-800/30 transition-colors">
                     <td className="px-6 py-4">
                       <div 
