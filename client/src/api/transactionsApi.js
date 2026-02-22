@@ -103,3 +103,19 @@ export const useTransaction = (transactionId) => {
 
     return { isLoading, transaction }
 }
+
+export const usePatchTransaction = () => {
+    const patch = async (transactionId, transactionData) =>
+        await request.patch(`${baseUrl}/${transactionId}`, transactionData)
+
+    return {
+        patch
+    }
+}
+
+export const useDeleteTransaction = () => {
+    const deleteTransaction = async (transactionId) => 
+        await request.delete(`${baseUrl}/${transactionId}`)
+
+    return { deleteTransaction }
+}

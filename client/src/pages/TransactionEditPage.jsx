@@ -1,17 +1,20 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from "react-router";
-import transactionService from '../services/transactionService';
 import { turnDateFormat } from '../utils/date';
 import categoriesService from '../services/categoriesService';
-import { useTransaction } from '../api/transactionsApi';
+import { useDeleteTransaction, usePatchTransaction, useTransaction } from '../api/transactionsApi';
+import { showToast } from '../utils/toastUtils';
 
 const TransactionEditPage = () => {
   const { id: transactionId } = useParams()
   const navigate = useNavigate()
   const { isLoading, transaction } = useTransaction(transactionId)
+  const { patch } = usePatchTransaction()
+  const { deleteTransaction } = useDeleteTransaction()
   const [type, setType] = useState('EXPENSE')
   const [categories, setCategories] = useState([])
+  const [categoryId, setCategoryId] = useState('')
 
   useEffect(() => {
     if (transaction?.type) setType(transaction.type)
@@ -22,10 +25,24 @@ const TransactionEditPage = () => {
       .then(setCategories)
   }, [])
 
+  useEffect(() => {
+    if (transaction?.categoryId !== undefined) {
+      setCategoryId(transaction.categoryId ?? '')
+    }
+  }, [transaction?.categoryId])
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-slate-300">
         Loading transaction...
+      </div>
+    );
+  }
+
+  if (!transaction) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-slate-300">
+        Transaction not found.
       </div>
     );
   }
@@ -41,9 +58,15 @@ const TransactionEditPage = () => {
     transactionData.notes = transactionData.notes || undefined
     transactionData.categoryId = transactionData.categoryId || undefined
 
-    await transactionService.patch(transactionId, transactionData)
+    try {
+      await patch(transactionId, transactionData)
+  
+      navigate('/transactions/list')
 
-    navigate('/transactions/list')
+      showToast('Updated Transaction Successfully!', 'success')
+    } catch (error) {
+      showToast(error.message || 'Failed to update transaction', 'error')
+    }
   }
 
   const transactionDeleteClickHandler = async() => {
@@ -51,9 +74,15 @@ const TransactionEditPage = () => {
 
     if (!hasConfirm) return
 
-    await transactionService.delete(transactionId)
+    try {
+      await deleteTransaction(transactionId)
+  
+      navigate('/transactions/list')
 
-    navigate('/transactions/list')
+      showToast('Deleted Transaction Successfully!', 'success')
+    } catch (error) {
+      showToast(error.message || 'Failed to delete transaction', 'error')
+    }
   }
 
   return (
@@ -71,11 +100,10 @@ const TransactionEditPage = () => {
 
         <form action={formatAction} className="bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl space-y-6">
           <input type="hidden" name="type" value={type} />
-          
+
           <div className="flex gap-4 p-1 bg-slate-950 rounded-xl border border-slate-800">
             <button
               type="button"
-              name='type'
               onClick={() => setType('EXPENSE')}
               className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${type === 'EXPENSE' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-lg shadow-rose-500/5' : 'text-slate-500 hover:text-slate-300'}`}
             >
@@ -83,7 +111,6 @@ const TransactionEditPage = () => {
             </button>
             <button
               type="button"
-              name='type'
               onClick={() => setType('INCOME')}
               className={`flex-1 py-3 rounded-lg text-sm font-bold transition-all ${type === 'INCOME' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-lg shadow-emerald-500/5' : 'text-slate-500 hover:text-slate-300'}`}
             >
@@ -133,7 +160,8 @@ const TransactionEditPage = () => {
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</label>
             <select
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition-all appearance-none"
-              defaultValue={transaction.categoryId ?? ""}
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
               name='categoryId'
             >
               <option value=''>No Category</option>
