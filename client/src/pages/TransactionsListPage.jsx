@@ -1,24 +1,16 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router';
-import transactionService from '../services/transactionService';
+import { Link } from 'react-router-dom';
 import { formatDate } from '../utils/date';
 import { formatCents } from '../utils/money';
 import categoriesService from '../services/categoriesService';
+import { useTransactions } from '../api/transactionsApi';
 
 const PAGE_SIZE = 5;
 
 const TransactionsListPage = () => {
-  const [transactions, setTransactions] = useState({
-    items: [],
-    page: 1,
-    pageSize: PAGE_SIZE,
-    totalItems: 0,
-    totalPages: 1,
-  })
-  const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1)
-
+  
   const [filters, setFilters] = useState({
     type: 'ALL',
     categoryId: '',
@@ -40,7 +32,7 @@ const TransactionsListPage = () => {
   useEffect(() => {
     setPage(1);
   }, [filters.type, filters.categoryId, filters.from, filters.to, filters.search])
-
+  
   const query = useMemo(() => {
     return {
       page,
@@ -51,16 +43,10 @@ const TransactionsListPage = () => {
       to: filters.to || undefined
     }
   }, [page, filters.type, filters.categoryId, filters.from, filters.to])
+  
+  const { isLoading, transactions } = useTransactions(query)
 
-  useEffect(() => {
-    setIsLoading(true);
-
-    transactionService.list(query)
-      .then(setTransactions)
-      .finally(() => setIsLoading(false))
-  }, [query])
-
-  const allTransactions = transactions.items || [];
+  const allTransactions = transactions?.items ?? [];
 
   const start = transactions.totalItems === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const end = Math.min(page * PAGE_SIZE, transactions.totalItems)
