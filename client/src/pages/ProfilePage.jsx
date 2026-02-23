@@ -1,60 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import analyticsService from "../services/analyticsService";
 import { formatMoney } from "../utils/money";
 import { formatPeriodLabel } from "../utils/date";
+import { useMonthlySummary } from "../api/analyticsApi";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const { id, firstName, lastName, email } = useAuth();
   const [currency] = useState("EUR"); // keep it simple for now (can wire later)
-  const [loadingInsights, setLoadingInsights] = useState(true);
-  const [insightsError, setInsightsError] = useState("");
-  const [monthlySummary, setMonthlySummary] = useState(null);
   const [isLoggingOut, _setIsLoggingOut] = useState(false);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setLoadingInsights(true);
-        setInsightsError("");
-
-        const data = await analyticsService.getMonthlySummary();
-
-        if (!cancelled) setMonthlySummary(data);
-      } catch (e) {
-        if (!cancelled) setInsightsError(e?.message || "Failed to load insights");
-      } finally {
-        if (!cancelled) setLoadingInsights(false);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const computed = useMemo(() => {
-    const periods = Array.isArray(monthlySummary?.periods) ? monthlySummary.periods : [];
-
-    // latest period = last item (assuming backend returns chronological)
-    const latest = periods.length ? periods[periods.length - 1] : null;    
-
-    // best/worst net month
-    let best = null;
-    let worst = null;
-    for (const p of periods) {
-      if (!best || Number(p.netCents || 0) > Number(best.netCents || 0)) best = p;
-      if (!worst || Number(p.netCents || 0) < Number(worst.netCents || 0)) worst = p;
-    }
-
-    return { periods, latest, best, worst };
-  }, [monthlySummary]);  
+  const {
+    data: monthlySummary,
+    computed,
+    isLoading: loadingInsights,
+    refetch
+  } = useMonthlySummary()
 
   const initials = `${(firstName || "U")[0] || "U"}${(lastName || "S")[0] || "S"}`.toUpperCase();
+
+  const hasData = monthlySummary && Array.isArray(monthlySummary.periods) && monthlySummary.periods.length > 0
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-blue-500/30 p-6 md:p-10">
@@ -173,9 +139,15 @@ const ProfilePage = () => {
             <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-5 text-sm text-slate-400">
               Loading insights…
             </div>
-          ) : insightsError ? (
-            <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl p-5 text-sm text-rose-300">
-              {insightsError}
+          ) : !hasData ? (
+            <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-5 text-sm text-slate-400 flex items-center justify-between gap-3">
+              <span>No insights yet. Add some transactions to see analytics.</span>
+              <button
+                onClick={() => refetch()}
+                className="px-3 py-2 rounded-lg bg-slate-800/60 border border-slate-700 text-xs font-bold text-slate-200 hover:bg-slate-800 transition-all"
+              >
+                Refresh
+              </button>
             </div>
           ) : (
             <>
