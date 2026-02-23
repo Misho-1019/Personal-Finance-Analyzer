@@ -48,3 +48,12 @@ export const useGetCategories = () => {
         refetch: fetchCategories
     }
 }
+
+export const useCreateCategories = () => {
+    const create = async (categoryData) =>
+        await request.post(baseUrl, categoryData)
+
+    return {
+        create
+    }
+}

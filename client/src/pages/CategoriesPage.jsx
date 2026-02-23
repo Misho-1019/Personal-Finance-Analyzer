@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import categoriesService from '../services/categoriesService';
 import { showToast } from '../utils/toastUtils';
-import { useGetCategories } from '../api/categoriesApi';
+import { useCreateCategories, useGetCategories } from '../api/categoriesApi';
 
 const CategoriesPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -10,6 +10,7 @@ const CategoriesPage = () => {
   const { categories, isCategoriesLoading, refetch } = useGetCategories();
   const [color, setColor] = useState('#10b981')
   const [categoryData, setCategoryData] = useState({name: ''})
+  const { create } = useCreateCategories()
 
   const handleCreate = () => {
     setSelectedCategory(null);
@@ -37,7 +38,7 @@ const CategoriesPage = () => {
     }
 
     try {
-      await categoriesService.createCategory(payload)
+      await create(payload)
 
       await refetch();
   
