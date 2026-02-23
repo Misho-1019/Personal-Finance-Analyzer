@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import categoriesService from '../services/categoriesService';
 import { showToast } from '../utils/toastUtils';
-import { useCreateCategories, useGetCategories } from '../api/categoriesApi';
+import { useCreateCategories, useDeleteCategories, useGetCategories, usePatchCategories } from '../api/categoriesApi';
 
 const CategoriesPage = () => {
   const [showModal, setShowModal] = useState(false);
@@ -11,6 +10,8 @@ const CategoriesPage = () => {
   const [color, setColor] = useState('#10b981')
   const [categoryData, setCategoryData] = useState({name: ''})
   const { create } = useCreateCategories()
+  const { patch } = usePatchCategories()
+  const { deleteCategory } = useDeleteCategories()
 
   const handleCreate = () => {
     setSelectedCategory(null);
@@ -63,7 +64,7 @@ const CategoriesPage = () => {
     }
 
     try {
-      await categoriesService.updateCategory(selectedCategory.id, payload)
+      await patch(selectedCategory.id, payload)
 
       await refetch()
   
@@ -79,7 +80,7 @@ const CategoriesPage = () => {
     if (!selectedCategory) return;
 
     try {
-      await categoriesService.deleteCategory(selectedCategory.id)
+      await deleteCategory(selectedCategory.id)
 
       await refetch();
 

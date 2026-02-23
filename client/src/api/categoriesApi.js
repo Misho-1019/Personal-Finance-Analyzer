@@ -57,3 +57,21 @@ export const useCreateCategories = () => {
         create
     }
 }
+
+export const usePatchCategories = () => {
+    const patch = async (categoryId, categoryData) =>
+        await request.patch(`${baseUrl}/${categoryId}`, categoryData)
+
+    return {
+        patch
+    }
+}
+
+export const useDeleteCategories = () => {
+    const deleteCategory = async (categoryId) =>
+        await request.delete(`${baseUrl}/${categoryId}`)
+
+    return {
+        deleteCategory
+    }
+}
