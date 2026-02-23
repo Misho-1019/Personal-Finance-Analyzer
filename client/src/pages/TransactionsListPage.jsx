@@ -3,8 +3,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDate } from '../utils/date';
 import { formatCents } from '../utils/money';
-import categoriesService from '../services/categoriesService';
 import { useTransactions } from '../api/transactionsApi';
+import { useGetCategories } from '../api/categoriesApi';
 
 const PAGE_SIZE = 5;
 
@@ -19,15 +19,7 @@ const TransactionsListPage = () => {
     to: ''
   });
 
-  const [categories, setCategories] = useState([])
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(true)
-
-  useEffect(() => {
-    setIsCategoriesLoading(true);
-    categoriesService.getCategories()
-      .then(setCategories)
-      .finally(() => setIsCategoriesLoading(false))
-  }, [])
+  const { categories, isCategoriesLoading } = useGetCategories()
 
   useEffect(() => {
     setPage(1);

@@ -2,9 +2,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from "react-router";
 import { turnDateFormat } from '../utils/date';
-import categoriesService from '../services/categoriesService';
 import { useDeleteTransaction, usePatchTransaction, useTransaction } from '../api/transactionsApi';
 import { showToast } from '../utils/toastUtils';
+import { useGetCategories } from '../api/categoriesApi';
 
 const TransactionEditPage = () => {
   const { id: transactionId } = useParams()
@@ -13,17 +13,12 @@ const TransactionEditPage = () => {
   const { patch } = usePatchTransaction()
   const { deleteTransaction } = useDeleteTransaction()
   const [type, setType] = useState('EXPENSE')
-  const [categories, setCategories] = useState([])
+  const { categories } = useGetCategories()
   const [categoryId, setCategoryId] = useState('')
 
   useEffect(() => {
     if (transaction?.type) setType(transaction.type)
   }, [transaction?.type])
-
-  useEffect(() => {
-    categoriesService.getCategories()
-      .then(setCategories)
-  }, [])
 
   useEffect(() => {
     if (transaction?.categoryId !== undefined) {

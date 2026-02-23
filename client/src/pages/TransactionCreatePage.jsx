@@ -1,23 +1,13 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from "react-router";
-import categoriesService from '../services/categoriesService';
 import { useCreateTransaction } from '../api/transactionsApi';
+import { useGetCategories } from '../api/categoriesApi';
 
 const TransactionCreatePage = () => {
   const navigate = useNavigate();
   const { create } = useCreateTransaction()
-  const [isLoading, setIsLoading] = useState(true);
+  const { categories, isCategoriesLoading } = useGetCategories()
   const [type, setType] = useState('EXPENSE');
-  const [categories, setCategories] = useState([])
-
-  useEffect(() => {
-    setIsLoading(true);
-
-    categoriesService.getCategories()
-      .then(setCategories)
-      .finally(() => setIsLoading(false))
-  }, [])
 
   const submitAction = async (formData) => {
     const transactionData = Object.fromEntries(formData)
@@ -131,10 +121,10 @@ const TransactionCreatePage = () => {
             </Link>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isCategoriesLoading}
               className="bg-linear-to-r from-indigo-500 via-violet-500 to-cyan-500 hover:from-indigo-600 hover:via-violet-600 hover:to-cyan-600 text-white font-semibold py-3 px-8 rounded-xl shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all disabled:opacity-50"
             >
-              {isLoading ? 'Saving...' : 'Save Transaction'}
+              {isCategoriesLoading ? 'Saving...' : 'Save Transaction'}
             </button>
           </div>
         </form>

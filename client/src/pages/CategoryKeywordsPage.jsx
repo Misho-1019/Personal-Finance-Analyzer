@@ -1,15 +1,15 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 import categoryKeywordService from '../services/categoryKeywordService';
-import categoriesService from "../services/categoriesService";
 import { showToast } from '../utils/toastUtils';
+import { useGetCategories } from '../api/categoriesApi';
 
 const CategoryKeywordsPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState(null);
   const [keywords, setKeywords] = useState([])
-  const [categories, setCategories] = useState([])
+  const { categories } = useGetCategories()
   const [isLoading, setIsLoading] = useState(true);
   const [keywordData, setKeywordData] = useState({ keyword: '' })
   const [category, setCategory] = useState('cmlitmb870004esv443bfg999')
@@ -27,14 +27,6 @@ const CategoryKeywordsPage = () => {
 
     categoryKeywordService.getKeywords()
     .then(setKeywords)
-    .finally(() => setIsLoading(false))
-  }, [])
-  
-  useEffect(() => {
-    setIsLoading(true);
-    
-    categoriesService.getCategories()
-    .then(setCategories)
     .finally(() => setIsLoading(false))
   }, [])
   
