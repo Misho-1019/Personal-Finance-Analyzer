@@ -1,16 +1,16 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from 'react';
-import categoryKeywordService from '../services/categoryKeywordService';
+import { useState } from 'react';
 import { showToast } from '../utils/toastUtils';
 import { useGetCategories } from '../api/categoriesApi';
+import { useCreateKeyword, useDeleteKeyword, useGetKeywords } from '../api/categoryKeywordApi';
 
 const CategoryKeywordsPage = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedKeyword, setSelectedKeyword] = useState(null);
-  const [keywords, setKeywords] = useState([])
+  const { keywords, isLoading, refetch } = useGetKeywords()
   const { categories } = useGetCategories()
-  const [isLoading, setIsLoading] = useState(true);
+  const { createKeyword } = useCreateKeyword()
+  const { deleteKeyword } = useDeleteKeyword()
   const [keywordData, setKeywordData] = useState({ keyword: '' })
   const [category, setCategory] = useState('cmlitmb870004esv443bfg999')
 
@@ -21,14 +21,6 @@ const CategoryKeywordsPage = () => {
     setCategory('cmlitmb870004esv443bfg999')
     setShowModal(true);
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-
-    categoryKeywordService.getKeywords()
-    .then(setKeywords)
-    .finally(() => setIsLoading(false))
-  }, [])
   
   const getCategoryName = (id) => categories.find(c => c.id === id)?.name || 'Unknown';
 
@@ -43,9 +35,9 @@ const CategoryKeywordsPage = () => {
     }
 
     try {
-      const newKeyword = await categoryKeywordService.createKeyword(payload)
+      await createKeyword(payload)
   
-      setKeywords((prev) => [...prev, newKeyword])
+      await refetch();
   
       setShowModal(false)
       showToast('Category Keyword successfully created!', 'success')
@@ -58,9 +50,9 @@ const CategoryKeywordsPage = () => {
     if (!selectedKeyword) return;
 
     try {
-      await categoryKeywordService.deleteKeyword(selectedKeyword.id)
+      await deleteKeyword(selectedKeyword.id)
 
-      setKeywords((prev) => prev.filter((k) => k.id !== selectedKeyword.id))
+      await refetch()
 
       setSelectedKeyword(null)
       setShowDeleteConfirm(false)
