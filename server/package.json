@@ -8,7 +8,7 @@
     "dev": "nodemon src/index.js",
     "seed": "prisma migrate reset --force && prisma db seed",
     "postinstall": "echo \"skip postinstall\"",
-    "migrate:deploy": "npx prisma@4.16.2 migrate deploy"
+    "migrate:deploy": "npx prisma migrate deploy"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
