@@ -3,12 +3,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { generateRefreshToken, hashToken } from "../utils/token.js";
 
-const SECRET = process.env.JWT_SECRET;
 const ACCESS_EXPIRES_IN = '15m';
 const REFRESH_DAYS = 7;
 
 function requiredSecret() {
-    if (!SECRET) throw new Error('JWT_SECRET is not set!')
+    const SECRET = process.env.JWT_SECRET;
+    if (!SECRET) throw new Error('JWT_SECRET is not set!');
+    return SECRET;
 }
 
 function buildAccessToken(user) {
@@ -21,7 +22,7 @@ function buildAccessToken(user) {
         email: user.email,
     }
 
-    const token = jwt.sign(payload, SECRET, { expiresIn: ACCESS_EXPIRES_IN })
+    const token = jwt.sign(payload, requiredSecret(), { expiresIn: ACCESS_EXPIRES_IN })
 
     return {
         token,

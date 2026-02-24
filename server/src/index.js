@@ -1,5 +1,4 @@
-import dotenv from "dotenv";
-dotenv.config();
+import '../src/env.js'
 
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -22,9 +21,11 @@ import { authMiddleware } from "./middlewares/authMiddleware.js";
 
 const app = express()
 
+const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173'
+
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: allowedOrigin,
     credentials: true,
   })
 )
@@ -41,7 +42,7 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
 })
 
-// app.use(limiter)
+app.use(limiter)
 
 app.use(router)
 

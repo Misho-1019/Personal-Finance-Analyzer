@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { cookieOptions } from "../utils/cookieOptions.js";
 
 export const authMiddleware = (req, res, next) => {
     const token = req.cookies['auth']
@@ -12,7 +13,7 @@ export const authMiddleware = (req, res, next) => {
         res.locals.user = decodedToken;
 
     } catch (error) {
-        res.clearCookie('auth')
+        res.clearCookie('auth', cookieOptions)
     }
 
     next()
