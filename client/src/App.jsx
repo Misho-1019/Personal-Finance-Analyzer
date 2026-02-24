@@ -24,12 +24,15 @@ function App() {
     <UserProvider>
       <ToastContainer />
       <Routes>
+        <Route path="/" element={<LandingPage />}/>
+
         <Route element={ <GuestGuard />}>
-          <Route path="/welcome" element={<LandingPage />}/>
           <Route path="/login" element={<LoginPage />}/>
           <Route path="/register" element={<RegisterPage />}/>
         </Route>
   
+        <Route path="/logout" element={<Logout />}/>
+        
         <Route element={ <AppLayout />}>
           <Route element={ <AuthGuard />}>
             <Route path="/dashboard" element={<AnalyticsPage />}/>
@@ -40,7 +43,6 @@ function App() {
             <Route path="/transactions/list" element={<TransactionsListPage />}/>
             <Route path="/about" element={<AboutPage />}/>
             <Route path="/profile" element={<ProfilePage />}/>
-            <Route path="/logout" element={<Logout />}/>
           </Route>
         </Route>
       </Routes>

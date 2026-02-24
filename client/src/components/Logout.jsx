@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 import { useLogout } from "../api/authApi"
 import { useEffect } from "react"
 import { showToast } from "../utils/toastUtils"
@@ -13,6 +13,6 @@ export default function Logout() {
     }, [isLoggedOut])
 
     return isLoggedOut 
-        ? <Navigate to='/welcome' /> 
-        : null
+        ? <Navigate to='/' replace />
+        : null    
 }
