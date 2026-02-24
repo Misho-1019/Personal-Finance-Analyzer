@@ -21,6 +21,8 @@ import { authMiddleware } from "./middlewares/authMiddleware.js";
 
 const app = express()
 
+app.set('trust proxy', 1)
+
 const allowedOrigin = process.env.FRONTEND_URL || 'http://localhost:5173'
 
 app.use(
