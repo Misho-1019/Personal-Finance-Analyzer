@@ -3,7 +3,9 @@ import request from "../utils/requester.js";
 import useAuth from "../hooks/useAuth.js";
 import { useEffect, useState } from "react";
 
-const baseUrl = 'http://localhost:3030/transactions';
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3030";
+
+const baseUrl = `${API_BASE}/transactions`;
 
 export const useCreateTransaction = () => {
     const { request } = useAuth();

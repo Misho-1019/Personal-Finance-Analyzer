@@ -2,7 +2,9 @@ import { useContext, useEffect, useRef, useState } from "react";
 import request from "../utils/requester.js";
 import { UserContext } from "../context/UserContext.jsx";
 
-const baseUrl = 'http://localhost:3030/auth';
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3030";
+
+const baseUrl = `${API_BASE}/auth`;
 
 export const useLogin = () => {
     const [isPending, setIsPending] = useState(false)

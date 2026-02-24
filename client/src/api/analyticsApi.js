@@ -2,7 +2,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import request from "../utils/requester.js"; // adjust path if necessary
 
-const baseUrl = "http://localhost:3030/analytics";
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3030";
+
+const baseUrl = `${API_BASE}/analytics`;
 
 const EMPTY = Object.freeze({});
 

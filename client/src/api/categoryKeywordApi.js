@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import request from "../utils/requester.js";
 
-const baseUrl = 'http://localhost:3030/category-keywords';
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3030";
+
+const baseUrl = `${API_BASE}/category-keywords`;
 
 export const useGetKeywords = () => {
     const [keywords, setKeywords] = useState([])
