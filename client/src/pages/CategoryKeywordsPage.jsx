@@ -12,7 +12,7 @@ const CategoryKeywordsPage = () => {
   const { createKeyword } = useCreateKeyword()
   const { deleteKeyword } = useDeleteKeyword()
   const [keywordData, setKeywordData] = useState({ keyword: '' })
-  const [category, setCategory] = useState('cmlitmb870004esv443bfg999')
+  const [category, setCategory] = useState('')
 
   
   const handleCreate = () => {
