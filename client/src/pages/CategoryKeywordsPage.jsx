@@ -1,4 +1,5 @@
-import { useState } from 'react';
+/* eslint-disable react-hooks/set-state-in-effect */
+import { useEffect, useState } from 'react';
 import { showToast } from '../utils/toastUtils';
 import { useGetCategories } from '../api/categoriesApi';
 import { useCreateKeyword, useDeleteKeyword, useGetKeywords } from '../api/categoryKeywordApi';
@@ -14,11 +15,23 @@ const CategoryKeywordsPage = () => {
   const [keywordData, setKeywordData] = useState({ keyword: '' })
   const [category, setCategory] = useState('')
 
+  useEffect(() => {
+    if (showModal && !category && categories?.length) {
+      setCategory(categories[0].id)
+    }
+  }, [showModal, category, categories])
   
   const handleCreate = () => {
     setSelectedKeyword(null);
     setKeywordData({ keyword: '' })
-    setCategory('cmlitmb870004esv443bfg999')
+
+    if (!categories?.length) {
+      showToast('Create at least one category first.', 'error');
+      return;
+    }
+    
+    const firstCategoryId = categories?.[0]?.id || '';
+    setCategory(firstCategoryId)
     setShowModal(true);
   };
   
@@ -32,6 +45,7 @@ const CategoryKeywordsPage = () => {
 
     if (!payload.keyword || !payload.categoryId) {
       showToast('Category Keyword and ID are required!', 'error')
+      return;
     }
 
     try {
@@ -146,9 +160,19 @@ const CategoryKeywordsPage = () => {
               
               <div>
                 <label className="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Target Category</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 appearance-none">
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 appearance-none"
+                >
+                  <option value="" disabled>
+                    Select category...
+                  </option>
+                
                   {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
                   ))}
                 </select>
               </div>
