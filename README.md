@@ -82,19 +82,25 @@ database design.
 
 ### 1️⃣ Analytics Dashboard
 
-*(Monthly overview and category breakdown)*
+![Analytics Dashboard](views/Screenshot%202026-02-25%20042156.png)
+![Analytics Dashboard](views/Screenshot%202026-02-25%20042038.png)
 
 ### 2️⃣ Transactions List
 
-*(Filtering and pagination controls)*
+![Transactions List](views/Screenshot%202026-02-25%20042355.png)
 
 ### 3️⃣ Create / Edit Transaction
 
+![Create Transaction](views/Screenshot%202026-02-25%20042438.png)
+![Edit Transaction](views/Screenshot%202026-02-25%20042503.png)
+
 ### 4️⃣ Categories Management
+
+![Categories Management](views/Screenshot%202026-02-25%20042533.png)
 
 ### 5️⃣ Keyword Rules (Auto-Categorization Setup)\*
 
-> Add screenshots here once finalized.
+![Keyword Rules](views/Screenshot%202026-02-25%20042542.png)
 
 ------------------------------------------------------------------------
 
@@ -169,7 +175,7 @@ user-scoped data).
 ### 1️⃣ Backend
 
 ``` bash
-cd backend
+cd server
 npm install
 npm run dev
 ```
@@ -185,7 +191,7 @@ npx prisma db seed
 ### 3️⃣ Frontend
 
 ``` bash
-cd frontend
+cd client
 npm install
 npm run dev
 ```
